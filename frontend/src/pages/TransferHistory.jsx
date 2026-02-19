@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom"
 import { useWallet } from "@txnlab/use-wallet-react"
 import algosdk from "algosdk"
 import axios from "axios"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
@@ -17,19 +19,37 @@ export default function TransferHistory() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetchHistory()
-  }, [])
+    if (tokenId) fetchHistory()
+  }, [tokenId])
 
   const fetchHistory = async () => {
-    const res = await axios.get(
-      `http://localhost:5000/api/transfers/${tokenId}`
-    )
-    setHistory(res.data)
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/transfers/${tokenId}`
+      )
+      setHistory(res.data || [])
+    } catch (err) {
+      console.error("Failed to fetch history:", err)
+      toast.error("Failed to load transfer history")
+    }
   }
 
   const handleTransfer = async () => {
 
-    if (!activeAccount) return
+    if (!activeAccount?.address) {
+      toast.error("Wallet not connected")
+      return
+    }
+
+    if (!receiver) {
+      toast.error("Please enter receiver address")
+      return
+    }
+
+    if (!algosdk.isValidAddress(receiver)) {
+      toast.error("Invalid Algorand address")
+      return
+    }
 
     setLoading(true)
 
@@ -57,19 +77,33 @@ export default function TransferHistory() {
         .sendRawTransaction(signed[0])
         .do()
 
-      await algosdk.waitForConfirmation(algodClient, txid, 4)
+      await algosdk.waitForConfirmation(algodClient, txid, 10)
 
+      const pendingInfo = await algodClient
+        .pendingTransactionInformation(txid)
+        .do()
+
+      if (pendingInfo["pool-error"]?.length > 0) {
+        throw new Error(pendingInfo["pool-error"])
+      }
+
+      // Update backend
       await axios.post("http://localhost:5000/api/transfer", {
-        tokenId,
+        tokenId: tokenId,
         from: activeAccount.address,
         to: receiver,
+        txId: txid,
         timestamp: new Date().toISOString()
       })
 
+      toast.success("Ownership transferred successfully!")
+
+      setReceiver("")
       fetchHistory()
 
     } catch (err) {
       console.error(err)
+      toast.error("Transfer failed: " + err.message)
     } finally {
       setLoading(false)
     }
@@ -82,16 +116,22 @@ export default function TransferHistory() {
         Transfer History - {tokenId}
       </h1>
 
+      {/* HISTORY SECTION */}
       <div className="space-y-4 mb-10">
-        {history.map((h, i) => (
-          <div key={i} className="border p-4 rounded-xl">
-            <p><b>From:</b> {h.from}</p>
-            <p><b>To:</b> {h.to}</p>
-            <p><b>Date:</b> {new Date(h.timestamp).toLocaleString()}</p>
-          </div>
-        ))}
+        {history.length === 0 ? (
+          <p className="text-gray-500">No transfer records found.</p>
+        ) : (
+          history.map((h, i) => (
+            <div key={i} className="border p-4 rounded-xl">
+              <p><b>From:</b> {h.from}</p>
+              <p><b>To:</b> {h.to}</p>
+              <p><b>Date:</b> {new Date(h.timestamp).toLocaleString()}</p>
+            </div>
+          ))
+        )}
       </div>
 
+      {/* TRANSFER SECTION */}
       <div className="border p-6 rounded-2xl space-y-4">
 
         <h2 className="text-xl font-semibold">
@@ -102,18 +142,20 @@ export default function TransferHistory() {
           value={receiver}
           onChange={(e) => setReceiver(e.target.value)}
           placeholder="Receiver Address"
-          className="w-full border px-4 py-3 rounded-xl"
+          className="w-full border px-4 py-3 rounded-xl font-mono text-sm"
         />
 
         <button
           onClick={handleTransfer}
           disabled={loading}
-          className="w-full bg-black text-white py-3 rounded-xl"
+          className="w-full bg-black text-white py-3 rounded-xl disabled:opacity-50"
         >
           {loading ? "Transferring..." : "Transfer"}
         </button>
 
       </div>
+
+      <ToastContainer position="top-right" autoClose={3000} />
 
     </div>
   )

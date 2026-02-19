@@ -159,6 +159,25 @@ def log_scan():
     return jsonify({"message": "Scan logged"}), 200
 
 
+@app.route('/api/transfers/<token_id>', methods=['GET'])
+def get_transfers(token_id):
+    try:
+        transfers = list(
+            transfers_collection.find(
+                {
+                    "$or": [
+                        {"tokenId": token_id},
+                        {"tokenId": str(token_id)},
+                        {"tokenId": int(token_id)}
+                    ]
+                },
+                {"_id": 0}
+            )
+        )
+        return jsonify(transfers), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 
 

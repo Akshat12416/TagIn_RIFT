@@ -25,7 +25,6 @@ export default function Verify() {
     }
   }, [])
 
-  // SHA256 helper
   const sha256 = async (message) => {
     const msgBuffer = new TextEncoder().encode(message)
     const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer)
@@ -51,9 +50,7 @@ export default function Verify() {
         ""
       )
 
-      // --------------------------------------------------
-      // 1️⃣ Fetch metadata hash from CONTRACT BOX
-      // --------------------------------------------------
+      // 🔹 1️⃣ Fetch metadata hash from CONTRACT BOX
 
       const boxName = new Uint8Array([
         ...new TextEncoder().encode("PROD_"),
@@ -77,11 +74,9 @@ export default function Verify() {
         return
       }
 
-      const chainHash = rawValue.slice(0, 32)   // first 32 bytes
+      const chainHash = rawValue.slice(0, 32)
 
-      // --------------------------------------------------
-      // 2️⃣ Fetch product from backend
-      // --------------------------------------------------
+      // 🔹 2️⃣ Fetch product from backend
 
       const res = await axios.get(
         `http://localhost:5000/api/product/${id}`
@@ -94,20 +89,17 @@ export default function Verify() {
         return
       }
 
-      // --------------------------------------------------
-      // 3️⃣ Recreate metadata hash locally
-      // --------------------------------------------------
+      // 🔹 3️⃣ Recreate metadata hash locally
 
-const metadata = {
-  product_name: product.product_name,
-  serial_number: product.serial_number,
-  model: product.model,
-  type: product.type,
-  color: product.color,
-  manufacture_date: product.manufacture_date,
-  manufacturer: product.manufacturer
-}
-
+      const metadata = {
+        product_name: product.product_name,
+        serial_number: product.serial_number,
+        model: product.model,
+        type: product.type,
+        color: product.color,
+        manufacture_date: product.manufacture_date,
+        manufacturer: product.manufacturer
+      }
 
       const metadataJson = JSON.stringify(
         metadata,
@@ -116,27 +108,20 @@ const metadata = {
 
       const localHash = await sha256(metadataJson)
 
-      // --------------------------------------------------
-      // 4️⃣ Compare hashes (byte comparison)
-      // --------------------------------------------------
+      // 🔹 DEBUG (can remove later)
 
-      // Convert Uint8Array → hex for readable comparison
-const toHex = (bytes) =>
-  Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("")
+      const toHex = (bytes) =>
+        Array.from(bytes)
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("")
 
-console.log("------ DEBUG HASH CHECK ------")
-console.log("Metadata JSON Used For Hash:")
-console.log(metadataJson)
+      console.log("------ DEBUG HASH CHECK ------")
+      console.log("Metadata JSON:", metadataJson)
+      console.log("Local Hash:", toHex(localHash))
+      console.log("On-Chain Hash:", toHex(chainHash))
+      console.log("------------------------------")
 
-console.log("Local Hash (hex):")
-console.log(toHex(localHash))
-
-console.log("On-Chain Hash (hex):")
-console.log(toHex(chainHash))
-console.log("------------------------------")
-
+      // 🔹 4️⃣ Compare
 
       const isVerified =
         localHash.length === chainHash.length &&
@@ -151,9 +136,7 @@ console.log("------------------------------")
 
       setResult(verificationResult)
 
-      // --------------------------------------------------
-      // 5️⃣ Log scan
-      // --------------------------------------------------
+      // 🔹 5️⃣ Log scan
 
       await axios.post("http://localhost:5000/api/scan", {
         tokenId: id,
@@ -183,7 +166,7 @@ console.log("------------------------------")
   return (
     <div className="min-h-screen bg-white flex flex-col items-center px-6 py-12">
 
-      <h1 className="text-4xl font-bold mb-8">
+      <h1 className="text-4xl font-bold mb-8 text-center">
         Verify Product Authenticity
       </h1>
 
@@ -219,12 +202,14 @@ console.log("------------------------------")
           </h2>
 
           {result.isVerified && (
-            <div className="space-y-4">
-              <p><b>Name:</b> {result.product.name}</p>
-              <p><b>Serial:</b> {result.product.serial}</p>
+            <div className="space-y-4 text-sm">
+
+              <p><b>Product Name:</b> {result.product.product_name}</p>
+              <p><b>Serial Number:</b> {result.product.serial_number}</p>
               <p><b>Model:</b> {result.product.model}</p>
               <p><b>Type:</b> {result.product.type}</p>
               <p><b>Color:</b> {result.product.color}</p>
+              <p><b>Manufacture Date:</b> {result.product.manufacture_date}</p>
 
               <p className="break-all">
                 <b>Manufacturer:</b> {result.manufacturer}
@@ -233,6 +218,20 @@ console.log("------------------------------")
               <p className="break-all">
                 <b>Current Owner:</b> {result.owner}
               </p>
+
+              <p>
+                <b>Asset ID:</b> {result.product.tokenId}
+              </p>
+
+              <a
+                href={`https://testnet.algoexplorer.io/asset/${result.product.tokenId}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                View on AlgoExplorer
+              </a>
+
             </div>
           )}
 

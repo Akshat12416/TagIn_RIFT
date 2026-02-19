@@ -9,6 +9,8 @@ export default function Dashboard({ userAddress }) {
   useEffect(() => {
     if (!userAddress) return;
 
+    setLoading(true);
+
     axios
       .get(`http://localhost:5000/api/products/${userAddress}`)
       .then((res) => {
@@ -33,7 +35,7 @@ export default function Dashboard({ userAddress }) {
             Manufacturer Dashboard
           </h1>
           <p className="text-gray-500 text-sm">
-            Wallet: <span className="font-mono">{userAddress}</span>
+            Wallet: <span className="font-mono break-all">{userAddress}</span>
           </p>
         </div>
 
@@ -47,19 +49,21 @@ export default function Dashboard({ userAddress }) {
             No products registered yet.
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-gray-200">
+          <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
 
             <table className="w-full text-sm text-left">
 
               <thead className="bg-black text-white">
                 <tr>
-                  <th className="px-6 py-4">Name</th>
-                  <th className="px-6 py-4">Serial</th>
+                  <th className="px-6 py-4">Product Name</th>
+                  <th className="px-6 py-4">Serial Number</th>
                   <th className="px-6 py-4">Model</th>
                   <th className="px-6 py-4">Type</th>
                   <th className="px-6 py-4">Color</th>
+                  <th className="px-6 py-4">Manufacture Date</th>
                   <th className="px-6 py-4">Token ID</th>
-                  <th className="px-6 py-4">Owner</th>
+                  <th className="px-6 py-4">Current Owner</th>
+                  <th className="px-6 py-4">Metadata Hash</th>
                   <th className="px-6 py-4">Explorer</th>
                 </tr>
               </thead>
@@ -70,15 +74,42 @@ export default function Dashboard({ userAddress }) {
                     key={index}
                     className="border-b hover:bg-gray-50 transition"
                   >
-                    <td className="px-6 py-4 font-medium">{p.name}</td>
-                    <td className="px-6 py-4">{p.serial}</td>
-                    <td className="px-6 py-4">{p.model}</td>
-                    <td className="px-6 py-4">{p.type}</td>
-                    <td className="px-6 py-4">{p.color}</td>
-                    <td className="px-6 py-4 font-mono">{p.tokenId}</td>
+                    <td className="px-6 py-4 font-medium">
+                      {p.product_name}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {p.serial_number}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {p.model}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {p.type}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {p.color}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {p.manufacture_date}
+                    </td>
+
+                    <td className="px-6 py-4 font-mono">
+                      {p.tokenId}
+                    </td>
+
                     <td className="px-6 py-4 font-mono text-xs break-all">
                       {p.owner}
                     </td>
+
+                    <td className="px-6 py-4 font-mono text-xs break-all max-w-[200px]">
+                      {p.metadataHash}
+                    </td>
+
                     <td className="px-6 py-4">
                       <a
                         href={`https://testnet.algoexplorer.io/asset/${p.tokenId}`}

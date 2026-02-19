@@ -36,7 +36,7 @@ export default function App() {
       />
 
       <Route path="/verify" element={<Verify />} />
-      <Route path="/transfer" element={<Transfer />} />
+     
 
       {/* Protected Register Route */}
       <Route
@@ -61,6 +61,20 @@ export default function App() {
             <>
               <ManufacturerNavbar />
               <Dashboard userAddress={userAddress} />
+            </>
+          ) : (
+            <Navigate to="/manufacturer-login" />
+          )
+        }
+      />
+
+      <Route
+        path="/transfer"
+        element={
+          isLoggedIn ? (
+            <>
+              <ManufacturerNavbar />
+              <Transfer userAddress={userAddress} />
             </>
           ) : (
             <Navigate to="/manufacturer-login" />

@@ -185,7 +185,7 @@ const Landing = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-4">
-                  <Link to="/login">
+                  <Link to="/user-login">
                   <Button className="bg-black hover:bg-gray-900 text-white px-6 py-6 rounded-2xl shadow-xl transition-all">
                     Get Started
                   </Button>

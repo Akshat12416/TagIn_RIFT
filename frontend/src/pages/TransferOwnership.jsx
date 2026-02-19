@@ -78,7 +78,7 @@ export default function TransferOwnership() {
       // 🔥 AFTER CONFIRMATION → UPDATE DATABASE
       // =====================================================
 
-      await axios.post("http://localhost:5000/api/transfer", {
+      await axios.post("https://taginriftbackend1.onrender.com/api/transfer", {
         tokenId: assetId,
         from: activeAccount.address,
         to: receiver,

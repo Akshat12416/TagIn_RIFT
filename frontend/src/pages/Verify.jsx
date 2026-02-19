@@ -72,7 +72,7 @@ export default function Verify() {
 
       // 🔹 Fetch backend product
       const res = await axios.get(
-        `http://localhost:5000/api/product/${id}`
+        `https://taginriftbackend1.onrender.com/api/product/${id}`
       )
 
       const product = res.data
@@ -110,7 +110,7 @@ export default function Verify() {
       })
 
       // 🔹 Log scan
-      await axios.post("http://localhost:5000/api/scan", {
+      await axios.post("https://taginriftbackend1.onrender.com/api/scan", {
         tokenId: id,
         manufacturer: product.manufacturer,
         owner: product.owner,

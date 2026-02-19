@@ -149,7 +149,7 @@ export default function RegisterProduct() {
 
       const base64Hash = btoa(String.fromCharCode(...metadataHash))
 
-      await axios.post("http://localhost:5000/api/mint", {
+      await axios.post("https://taginriftbackend1.onrender.com/api/mint", {
         ...metadata,
         tokenId: assetId,
         metadataHash: base64Hash,

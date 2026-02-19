@@ -12,7 +12,7 @@ export default function Dashboard({ userAddress }) {
     setLoading(true);
 
     axios
-      .get(`http://localhost:5000/api/products/${userAddress}`)
+      .get(`https://taginriftbackend1.onrender.com/api/products/${userAddress}`)
       .then((res) => {
         setProducts(res.data);
         setLoading(false);

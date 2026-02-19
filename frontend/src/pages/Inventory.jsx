@@ -78,7 +78,7 @@ const ownedAssetIds = ownedAssets
               console.log("Fetching backend product for Asset ID:", id)
 
               const res = await axios.get(
-                `http://localhost:5000/api/product/${id}`
+                `https://taginriftbackend1.onrender.com/api/product/${id}`
               )
 
               console.log("Backend Response for", id, ":", res.data)

@@ -25,7 +25,7 @@ export default function TransferHistory() {
   const fetchHistory = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/transfers/${tokenId}`
+        `https://taginriftbackend1.onrender.com/api/transfers/${tokenId}`
       )
       setHistory(res.data || [])
     } catch (err) {
@@ -88,7 +88,7 @@ export default function TransferHistory() {
       }
 
       // Update backend
-      await axios.post("http://localhost:5000/api/transfer", {
+      await axios.post("https://taginriftbackend1.onrender.com/api/transfer", {
         tokenId: tokenId,
         from: activeAccount.address,
         to: receiver,

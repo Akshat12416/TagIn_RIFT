@@ -61,16 +61,20 @@ def api_mint():
     data = request.json
 
     products_collection.insert_one({
-        "name": data["product_name"],
-        "serial": data["serial_number"],
+        "product_name": data["product_name"],
+        "serial_number": data["serial_number"],
         "model": data["model"],
+        "type": data["type"],
         "color": data["color"],
+        "manufacture_date": data["manufacture_date"],   # 👈 IMPORTANT
         "tokenId": str(data["tokenId"]),
         "metadataHash": data["metadataHash"],
         "manufacturer": data["manufacturer"],
         "owner": data["manufacturer"],
-        "date": datetime.utcnow()
+        "createdAt": datetime.utcnow()
     })
+
+
 
     return jsonify({"message": "Stored successfully"}), 200
 
@@ -131,6 +135,29 @@ def get_products_by_manufacturer(address):
         return jsonify(products), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+# ─────────────────────────────
+# LOG SCAN EVENT
+# ─────────────────────────────
+@app.route("/api/scan", methods=["POST"])
+def log_scan():
+
+    data = request.json
+
+    scans_collection = db["scans"]
+
+    scans_collection.insert_one({
+        "tokenId": str(data["tokenId"]),
+        "manufacturer": data["manufacturer"],
+        "owner": data["owner"],
+        "isVerified": data["isVerified"],
+        "source": data["source"],  # manual or nfc
+        "timestamp": data["timestamp"]
+    })
+
+    return jsonify({"message": "Scan logged"}), 200
+
 
 
 

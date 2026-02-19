@@ -64,7 +64,6 @@ export default function Dashboard({ userAddress }) {
                   <th className="px-6 py-4">Token ID</th>
                   <th className="px-6 py-4">Current Owner</th>
                   <th className="px-6 py-4">Metadata Hash</th>
-                  <th className="px-6 py-4">Explorer</th>
                 </tr>
               </thead>
 
@@ -110,16 +109,6 @@ export default function Dashboard({ userAddress }) {
                       {p.metadataHash}
                     </td>
 
-                    <td className="px-6 py-4">
-                      <a
-                        href={`https://testnet.algoexplorer.io/asset/${p.tokenId}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        View
-                      </a>
-                    </td>
                   </tr>
                 ))}
               </tbody>

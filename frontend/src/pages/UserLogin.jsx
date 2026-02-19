@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { useWallet } from "@txnlab/use-wallet-react"
 import { WalletButton } from "@txnlab/use-wallet-ui-react"
 import { useNavigate } from "react-router-dom"
@@ -8,11 +8,10 @@ export default function UserLogin() {
   const { activeAccount } = useWallet()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (activeAccount?.address) {
-      navigate("/inventory", { replace: true })
-    }
-  }, [activeAccount, navigate])
+  const handleContinue = () => {
+    if (!activeAccount?.address) return
+    navigate("/inventory")
+  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
@@ -30,6 +29,16 @@ export default function UserLogin() {
         <div className="flex justify-center">
           <WalletButton />
         </div>
+
+        {/* 🔥 Only show continue if wallet connected */}
+        {activeAccount?.address && (
+          <button
+            onClick={handleContinue}
+            className="w-full bg-black text-white py-3 rounded-2xl font-medium"
+          >
+            Continue to Inventory
+          </button>
+        )}
 
       </div>
     </div>

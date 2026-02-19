@@ -36,28 +36,38 @@ export default function ManufacturerLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 px-6">
 
-      <div className="bg-white p-10 rounded-3xl shadow-xl w-full max-w-md">
+      <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md border border-gray-200">
 
-        <h1 className="text-xl font-bold mb-6 text-center">
+        <h1 className="text-2xl font-semibold mb-2 text-center tracking-wide">
           Manufacturer Login
         </h1>
 
-        <div className="flex justify-center mb-6">
-          <WalletButton />
+        <p className="text-center text-sm text-gray-500 mb-8">
+          Connect your Algorand wallet to continue
+        </p>
+
+        {/* Wallet Connect Section */}
+        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-8">
+        <WalletButton className="!bg-black !text-white !rounded-2xl !px-6 !py-3 hover:!bg-gray-900 transition" />
+        </div>
+
         </div>
 
         <button
           onClick={handleLogin}
-          className="w-full bg-black text-white py-3 rounded-xl"
+          className="w-full bg-black hover:bg-gray-900 transition text-white py-3 rounded-2xl font-medium shadow-md"
         >
-          Login
+          Continue
         </button>
 
-        <p className="text-center text-sm mt-4 text-gray-600">
-          {status}
-        </p>
+        {status && (
+          <p className="text-center text-sm mt-6 text-red-500">
+            {status}
+          </p>
+        )}
 
       </div>
     </div>

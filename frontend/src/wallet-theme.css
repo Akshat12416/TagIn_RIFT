@@ -1,0 +1,39 @@
+/* Overlay background */
+.wallet-modal-overlay {
+  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.45) !important;
+}
+
+/* Main modal container */
+.wallet-modal {
+  border-radius: 24px !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25) !important;
+  padding: 28px !important;
+  background: #ffffff !important;
+  max-width: 420px !important;
+}
+
+/* Header */
+.wallet-modal h2 {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  margin-bottom: 18px !important;
+}
+
+/* Wallet option buttons */
+.wallet-modal button {
+  border-radius: 16px !important;
+  padding: 14px !important;
+  transition: all 0.2s ease !important;
+  font-weight: 500 !important;
+}
+
+.wallet-modal button:hover {
+  background-color: #f5f5f5 !important;
+  transform: translateY(-1px);
+}
+
+/* Close button */
+.wallet-modal button[aria-label="Close"] {
+  background: transparent !important;
+}

@@ -10,6 +10,16 @@ const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
 const APP_ID = 755785502   
 
+// 🔥 Hardcoded Demo Data
+const DEMO_DATA = {
+  name: "Rolex Submariner",
+  serial: "RX-2026-7788",
+  model: "Luxury Edition",
+  type: "Watch",
+  color: "Gold",
+  manufactureDate: "20-02-2026"
+}
+
 export default function RegisterProduct() {
 
   const { activeAccount, signTransactions } = useWallet()
@@ -29,6 +39,12 @@ export default function RegisterProduct() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
+  // 🔥 Fill Demo Data Function
+  const handleFillDemo = () => {
+    setForm(DEMO_DATA)
+    toast.info("Demo data filled")
+  }
+
   const handleRegister = async () => {
 
     if (!activeAccount?.address) {
@@ -38,10 +54,6 @@ export default function RegisterProduct() {
 
     try {
       setLoading(true)
-
-      // -----------------------------------------
-      // 1️⃣ PREPARE METADATA + HASH
-      // -----------------------------------------
 
       const metadata = {
         product_name: form.name,
@@ -61,10 +73,6 @@ export default function RegisterProduct() {
 
       const algodClient = new algosdk.Algodv2(ALGOD_TOKEN, ALGOD_SERVER, "")
       const params = await algodClient.getTransactionParams().do()
-
-      // -----------------------------------------
-      // 2️⃣ STEP ONE — CREATE NFT
-      // -----------------------------------------
 
       const assetTxn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
         sender: activeAccount.address,
@@ -90,25 +98,15 @@ export default function RegisterProduct() {
         .pendingTransactionInformation(assetTxId)
         .do()
 
-      console.log("Asset Pending Info:", pendingInfo)
-
       const assetId = Number(pendingInfo.assetIndex)
 
-      if (!assetId) {
-        throw new Error("Asset creation failed")
-      }
+      if (!assetId) throw new Error("Asset creation failed")
 
-      // -----------------------------------------
-      // 3️⃣ STEP TWO — CALL SMART CONTRACT
-      // -----------------------------------------
-
-      // WL_<address>  (uses raw public key bytes)
       const wlBoxName = new Uint8Array([
         ...new TextEncoder().encode("WL_"),
         ...algosdk.decodeAddress(activeAccount.address).publicKey
       ])
 
-      // PROD_<assetId>
       const prodBoxName = new Uint8Array([
         ...new TextEncoder().encode("PROD_"),
         ...algosdk.encodeUint64(assetId)
@@ -124,14 +122,8 @@ export default function RegisterProduct() {
           metadataHash
         ],
         boxes: [
-          {
-            appIndex: APP_ID,
-            name: wlBoxName
-          },
-          {
-            appIndex: APP_ID,
-            name: prodBoxName
-          }
+          { appIndex: APP_ID, name: wlBoxName },
+          { appIndex: APP_ID, name: prodBoxName }
         ]
       })
 
@@ -142,10 +134,6 @@ export default function RegisterProduct() {
         .do()
 
       await algosdk.waitForConfirmation(algodClient, appTxId, 4)
-
-      // -----------------------------------------
-      // 4️⃣ STORE IN DATABASE
-      // -----------------------------------------
 
       const base64Hash = btoa(String.fromCharCode(...metadataHash))
 
@@ -176,29 +164,42 @@ export default function RegisterProduct() {
   }
 
   return (
-    <div className="min-h-screen bg-white px-6 py-10">
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-100 px-6 py-10">
 
       <div className="flex justify-end mb-6">
         <WalletButton />
       </div>
 
-      <div className="max-w-2xl mx-auto bg-neutral-100 p-8 rounded-2xl space-y-6">
+      <div className="max-w-3xl mx-auto bg-white shadow-xl border border-gray-200 p-10 rounded-3xl space-y-6">
 
-        <h1 className="text-3xl font-semibold text-center">
-          Register Product
-        </h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-semibold">
+            Register Product
+          </h1>
 
-        <input name="name" value={form.name} onChange={handleChange} placeholder="Product Name" className="w-full px-4 py-3 border rounded-xl" />
-        <input name="serial" value={form.serial} onChange={handleChange} placeholder="Serial Number" className="w-full px-4 py-3 border rounded-xl" />
-        <input name="model" value={form.model} onChange={handleChange} placeholder="Model" className="w-full px-4 py-3 border rounded-xl" />
-        <input name="type" value={form.type} onChange={handleChange} placeholder="Product Type" className="w-full px-4 py-3 border rounded-xl" />
-        <input name="color" value={form.color} onChange={handleChange} placeholder="Color" className="w-full px-4 py-3 border rounded-xl" />
-        <input name="manufactureDate" value={form.manufactureDate} onChange={handleChange} placeholder="Manufacture Date" className="w-full px-4 py-3 border rounded-xl" />
+          <button
+            onClick={handleFillDemo}
+            className="bg-gray-200 hover:bg-gray-300 text-sm px-4 py-2 rounded-xl transition"
+          >
+            Fill Demo Data
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <input name="name" value={form.name} onChange={handleChange} placeholder="Product Name" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
+          <input name="serial" value={form.serial} onChange={handleChange} placeholder="Serial Number" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
+          <input name="model" value={form.model} onChange={handleChange} placeholder="Model" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
+          <input name="type" value={form.type} onChange={handleChange} placeholder="Product Type" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
+          <input name="color" value={form.color} onChange={handleChange} placeholder="Color" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
+          <input name="manufactureDate" value={form.manufactureDate} onChange={handleChange} placeholder="Manufacture Date" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
+
+        </div>
 
         <button
           onClick={handleRegister}
           disabled={loading}
-          className="w-full bg-black text-white py-4 rounded-2xl font-semibold"
+          className="w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition shadow-md"
         >
           {loading ? "Registering..." : "Register Product"}
         </button>

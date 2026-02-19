@@ -57,5 +57,5 @@ def remove_from_whitelist(address):
 
 if __name__ == "__main__":
     # Example usage:
-    test_address = "PASTE_ANOTHER_TESTNET_ADDRESS_HERE"
+    test_address = "EMKJ5AMYYB6XZTNDXWU6M2NTYQY7ZPPSLSSMALZHAXOUWOPTDNVJ5UUBFA"
     add_to_whitelist(test_address)

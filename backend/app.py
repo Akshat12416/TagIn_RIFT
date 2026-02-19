@@ -114,6 +114,21 @@ def transfer_ownership():
 
     return jsonify({"message": "Ownership updated in DB"}), 200
 
+@app.route('/api/products/<address>', methods=['GET'])
+def get_products_by_manufacturer(address):
+    try:
+        products = list(
+            products_collection.find(
+                {"manufacturer": address},
+                {"_id": 0}
+            )
+        )
+        return jsonify(products), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

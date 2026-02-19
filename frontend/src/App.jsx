@@ -7,6 +7,7 @@ import Register from "./pages/RegisterProduct";
 import Verify from "./pages/Verify";
 import Dashboard from "./pages/Dashboard";
 import Transfer from "./pages/TransferOwnership";
+import ManufacturerNavbar from "./components/ManufacturerNavbar";
 
 export default function App() {
 
@@ -21,6 +22,7 @@ export default function App() {
   return (
     <Routes>
 
+      {/* Public Routes */}
       <Route path="/" element={<Landing />} />
 
       <Route
@@ -33,26 +35,38 @@ export default function App() {
         }
       />
 
+      <Route path="/verify" element={<Verify />} />
+      <Route path="/transfer" element={<Transfer />} />
+
+      {/* Protected Register Route */}
       <Route
         path="/register"
         element={
           isLoggedIn ? (
-            <Register userAddress={userAddress} />
+            <>
+              <ManufacturerNavbar />
+              <Register userAddress={userAddress} />
+            </>
           ) : (
             <Navigate to="/manufacturer-login" />
           )
         }
       />
 
+      {/* Protected Dashboard Route */}
       <Route
         path="/dashboard"
         element={
-          isLoggedIn ? <Dashboard /> : <Navigate to="/manufacturer-login" />
+          isLoggedIn ? (
+            <>
+              <ManufacturerNavbar />
+              <Dashboard userAddress={userAddress} />
+            </>
+          ) : (
+            <Navigate to="/manufacturer-login" />
+          )
         }
       />
-
-      <Route path="/verify" element={<Verify />} />
-      <Route path="/transfer" element={<Transfer />} />
 
     </Routes>
   );

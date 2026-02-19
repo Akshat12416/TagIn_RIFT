@@ -98,21 +98,26 @@ def transfer_ownership():
     token_id = str(data["tokenId"])
     from_address = data["from"]
     to_address = data["to"]
+    tx_id = data["txId"]
     timestamp = data["timestamp"]
 
+    # Update owner in products collection
     products_collection.update_one(
         {"tokenId": token_id},
         {"$set": {"owner": to_address}}
     )
 
+    # Insert transfer record
     transfers_collection.insert_one({
         "tokenId": token_id,
         "from": from_address,
         "to": to_address,
+        "txId": tx_id,
         "timestamp": timestamp
     })
 
     return jsonify({"message": "Ownership updated in DB"}), 200
+
 
 @app.route('/api/products/<address>', methods=['GET'])
 def get_products_by_manufacturer(address):

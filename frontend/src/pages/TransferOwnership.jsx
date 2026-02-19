@@ -10,72 +10,98 @@ const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
 
 export default function TransferOwnership() {
+
   const { activeAccount, signTransactions } = useWallet()
 
   const [assetId, setAssetId] = useState("")
   const [receiver, setReceiver] = useState("")
   const [loading, setLoading] = useState(false)
 
-const handleTransfer = async () => {
+  const handleTransfer = async () => {
 
-  if (!activeAccount?.address) {
-    toast.error("Connect wallet first")
-    return
-  }
+    if (!activeAccount?.address) {
+      toast.error("Wallet not connected")
+      return
+    }
 
-  if (!assetId || !receiver) {
-    toast.error("Fill all fields")
-    return
-  }
+    if (!assetId || !receiver) {
+      toast.error("Please fill all fields")
+      return
+    }
 
-  if (!algosdk.isValidAddress(receiver)) {
-    toast.error("Invalid Algorand address")
-    return
-  }
+    if (!algosdk.isValidAddress(receiver)) {
+      toast.error("Invalid Algorand address")
+      return
+    }
 
-  try {
-    setLoading(true)
+    try {
+      setLoading(true)
 
-    const algodClient = new algosdk.Algodv2(
-      ALGOD_TOKEN,
-      ALGOD_SERVER,
-      ""
-    )
+      const algodClient = new algosdk.Algodv2(
+        ALGOD_TOKEN,
+        ALGOD_SERVER,
+        ""
+      )
 
-    const params = await algodClient.getTransactionParams().do()
+      const params = await algodClient.getTransactionParams().do()
 
-    const txn =
-      algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-        sender: activeAccount.address,   // ✅ correct
+      // 🔥 Create Transfer Transaction
+      const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+        sender: activeAccount.address,
         receiver: receiver,
         amount: 1,
         assetIndex: Number(assetId),
-        suggestedParams: params,
+        suggestedParams: params
       })
 
-    // ✅ DO NOT encode manually
-    const signedTxns = await signTransactions([txn])
+      // 🔥 Sign via wallet
+      const signedTxns = await signTransactions([txn])
 
-    const { txId } = await algodClient
-      .sendRawTransaction(signedTxns)
-      .do()
+      // 🔥 Send to blockchain
+      const { txid } = await algodClient
+        .sendRawTransaction(signedTxns[0])
+        .do()
 
-    await algosdk.waitForConfirmation(algodClient, txId, 4)
+      console.log("Transfer TxID:", txid)
 
-    toast.success("NFT transferred successfully!")
+      await algosdk.waitForConfirmation(algodClient, txid, 10)
 
-  } catch (err) {
-    console.error(err)
-    toast.error("Transfer failed: " + err.message)
-  } finally {
-    setLoading(false)
+      const pendingInfo = await algodClient
+        .pendingTransactionInformation(txid)
+        .do()
+
+      if (pendingInfo["pool-error"] && pendingInfo["pool-error"].length > 0) {
+        throw new Error(pendingInfo["pool-error"])
+      }
+
+      // =====================================================
+      // 🔥 AFTER CONFIRMATION → UPDATE DATABASE
+      // =====================================================
+
+      await axios.post("http://localhost:5000/api/transfer", {
+        tokenId: assetId,
+        from: activeAccount.address,
+        to: receiver,
+        txId: txid,
+        timestamp: new Date().toISOString()
+      })
+
+      toast.success("NFT transferred & database updated!")
+
+      setAssetId("")
+      setReceiver("")
+
+    } catch (err) {
+      console.error(err)
+      toast.error("Transfer failed: " + err.message)
+    } finally {
+      setLoading(false)
+    }
   }
-}
-
-
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
+
       <div className="w-full max-w-2xl">
 
         <div className="flex justify-end mb-6">
@@ -87,12 +113,13 @@ const handleTransfer = async () => {
         </h1>
 
         <div className="bg-neutral-100 p-8 rounded-2xl border space-y-6">
+
           <div>
             <label className="block mb-2 text-sm font-medium">
               Asset ID
             </label>
             <input
-              type="text"
+              type="number"
               value={assetId}
               onChange={(e) => setAssetId(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border"
@@ -116,14 +143,16 @@ const handleTransfer = async () => {
           <button
             onClick={handleTransfer}
             disabled={loading}
-            className="w-full bg-black text-white py-4 rounded-2xl font-semibold"
+            className="w-full bg-black text-white py-4 rounded-2xl font-semibold disabled:opacity-50"
           >
             {loading ? "Transferring..." : "Transfer NFT"}
           </button>
+
         </div>
       </div>
 
       <ToastContainer position="top-right" autoClose={3000} />
+
     </div>
   )
 }

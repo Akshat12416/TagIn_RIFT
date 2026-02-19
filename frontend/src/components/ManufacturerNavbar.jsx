@@ -27,6 +27,10 @@ export default function ManufacturerNavbar() {
           Dashboard
         </Link>
 
+        <Link to="/transfer" className="hover:underline">
+          Ownership Transfer
+        </Link>
+
         <span className="text-xs font-mono opacity-70 hidden md:block">
           {wallet?.slice(0,6)}...{wallet?.slice(-4)}
         </span>

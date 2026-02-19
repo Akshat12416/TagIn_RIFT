@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css"
 
 const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
-const APP_ID = 755785502   // 🔥 Your deployed App ID
+const APP_ID = 755785502   
 
 export default function RegisterProduct() {
 

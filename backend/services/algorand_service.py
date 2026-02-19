@@ -4,6 +4,7 @@ import hashlib
 import base64
 from algosdk.v2client import algod, indexer
 from algosdk import account, transaction
+from algosdk.encoding import encode_address
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -62,7 +63,7 @@ def create_nft(metadata_hash: bytes):
 
 
 # ─────────────────────────────
-# REGISTER IN SMART CONTRACT
+# REGISTER PRODUCT IN BOX
 # ─────────────────────────────
 def register_product(asset_id: int, metadata_hash: bytes):
 
@@ -103,25 +104,21 @@ def mint_product(metadata: dict):
 
 
 # ─────────────────────────────
-# TRANSFER NFT
+# VERIFY PRODUCT
 # ─────────────────────────────
-def transfer_nft(asset_id: int, receiver: str):
+def verify_product(asset_id: int, backend_metadata: dict):
 
-    params = algod_client.suggested_params()
+    backend_hash = compute_metadata_hash(backend_metadata)
+    box_hash, manufacturer = get_box_data(asset_id)
+    nft_hash = get_asset_metadata_hash(asset_id)
+    owner = get_asset_owner(asset_id)
 
-    txn = transaction.AssetTransferTxn(
-        sender=sender,
-        sp=params,
-        receiver=receiver,
-        amt=1,
-        index=asset_id
-    )
-
-    signed_txn = txn.sign(private_key)
-    txid = algod_client.send_transaction(signed_txn)
-    transaction.wait_for_confirmation(algod_client, txid, 4)
-
-    return {"message": "Transfer successful"}
+    return {
+        "verified": backend_hash == box_hash == nft_hash,
+        "owner": owner,
+        "manufacturer": manufacturer,
+        "assetId": asset_id
+    }
 
 
 # ─────────────────────────────
@@ -130,7 +127,6 @@ def transfer_nft(asset_id: int, receiver: str):
 def get_asset_owner(asset_id):
 
     response = indexer_client.asset_balances(asset_id)
-
     balances = response.get("balances", [])
 
     for acc in balances:
@@ -151,32 +147,63 @@ def get_box_data(asset_id):
     raw_value = base64.b64decode(box["value"])
 
     metadata_hash = raw_value[:32]
-    manufacturer = raw_value[32:]
+    manufacturer_bytes = raw_value[32:]
 
-    return metadata_hash, manufacturer
+    manufacturer_address = encode_address(manufacturer_bytes)
+
+    return metadata_hash, manufacturer_address
 
 
 # ─────────────────────────────
-# VERIFY PRODUCT
+# GET NFT HASH
 # ─────────────────────────────
-def verify_product(asset_id: int, backend_metadata: dict):
-
-    backend_hash = compute_metadata_hash(backend_metadata)
-    box_hash, manufacturer = get_box_data(asset_id)
-    nft_hash = get_asset_metadata_hash(asset_id)
-    owner = get_asset_owner(asset_id)
-
-    return {
-        "verified": backend_hash == box_hash == nft_hash,
-        "owner": owner,
-        "manufacturer": manufacturer,
-        "assetId": asset_id
-    }
-
-
 def get_asset_metadata_hash(asset_id):
 
     asset_info = algod_client.asset_info(asset_id)
     b64_hash = asset_info["params"]["metadata-hash"]
 
     return base64.b64decode(b64_hash)
+
+
+# ─────────────────────────────
+# ON-CHAIN WHITELIST CHECK
+# ─────────────────────────────
+def is_whitelisted(address: str):
+
+    try:
+        box_name = b"WL_" + address.encode()
+
+        box = algod_client.application_box_by_name(APP_ID, box_name)
+
+        # Optional: verify value is actually "1"
+        value = base64.b64decode(box["value"])
+
+        return value == b"1"
+
+    except Exception:
+        return False
+
+
+
+# ─────────────────────────────
+# ADMIN: ADD MANUFACTURER
+# ─────────────────────────────
+def add_manufacturer(address: str):
+
+    params = algod_client.suggested_params()
+
+    txn = transaction.ApplicationNoOpTxn(
+        sender=sender,
+        sp=params,
+        index=APP_ID,
+        app_args=[b"add_manufacturer"],
+        boxes=[
+            (APP_ID, b"WHITELIST_" + address.encode())
+        ]
+    )
+
+    signed_txn = txn.sign(private_key)
+    txid = algod_client.send_transaction(signed_txn)
+    transaction.wait_for_confirmation(algod_client, txid, 4)
+
+    return {"message": "Manufacturer added on-chain"}

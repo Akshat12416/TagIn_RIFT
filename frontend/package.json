@@ -11,10 +11,16 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.0",
+    "@txnlab/use-wallet-react": "^4.5.0",
+    "@txnlab/use-wallet-ui-react": "^1.0.0",
+    "algosdk": "^3.5.2",
     "axios": "^1.13.5",
+    "crypto-js": "^4.2.0",
+    "lute-connect": "^1.7.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0",
+    "react-toastify": "^11.0.5",
     "tailwindcss": "^4.2.0"
   },
   "devDependencies": {

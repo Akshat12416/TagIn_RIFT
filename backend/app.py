@@ -1,81 +1,119 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
-from datetime import datetime, timedelta
-from collections import defaultdict
+from datetime import datetime
 import os
+from dotenv import load_dotenv
+
 from services.algorand_service import (
     mint_product,
     verify_product,
-    transfer_nft
+    is_whitelisted
 )
-from dotenv import load_dotenv
+
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
 client = MongoClient(os.getenv("MONGO_URI"))
-db = client['product_verification']
-products_collection = db['products']
-transfers_collection = db['transfers']
-scans_collection = db['scans']   # 👈 NEW: store verification scans
+db = client["product_verification"]
+
+products_collection = db["products"]
+transfers_collection = db["transfers"]
 
 
-@app.route('/api/register', methods=['POST'])
-def register_product():
-    data = request.json
-    if not data:
-        return jsonify({"error": "No data provided"}), 400
+# ─────────────────────────────
+# ON-CHAIN WHITELIST CHECK
+# ─────────────────────────────
+@app.route("/api/check-whitelist/<address>", methods=["GET"])
+def check_whitelist(address):
 
-    data['tokenId'] = str(data['tokenId'])
-    products_collection.insert_one(data)
+    allowed = is_whitelisted(address)
 
-    return jsonify({"message": "Product registered"}), 200
+    return jsonify({
+        "allowed": allowed
+    }), 200
 
 
-    
-@app.route("/api/mint", methods=["POST"]) #NEW
+# ─────────────────────────────
+# GET PRODUCT
+# ─────────────────────────────
+@app.route("/api/product/<token_id>", methods=["GET"])
+def get_product_by_token_id(token_id):
+
+    product = products_collection.find_one(
+        {"tokenId": str(token_id)}, {"_id": 0}
+    )
+
+    if product:
+        return jsonify(product), 200
+    else:
+        return jsonify({"error": "Product not found"}), 404
+
+
+# ─────────────────────────────
+# STORE MINT RESULT (After Wallet Signing)
+# ─────────────────────────────
+@app.route("/api/mint", methods=["POST"])
 def api_mint():
 
     data = request.json
 
-    metadata = {
-        "product_name": data["product_name"],
-        "serial_number": data["serial_number"],
+    products_collection.insert_one({
+        "name": data["product_name"],
+        "serial": data["serial_number"],
         "model": data["model"],
         "color": data["color"],
-        "manufacturer": data["manufacturer"]
-    }
+        "tokenId": str(data["tokenId"]),
+        "metadataHash": data["metadataHash"],
+        "manufacturer": data["manufacturer"],
+        "owner": data["manufacturer"],
+        "date": datetime.utcnow()
+    })
 
-    result = mint_product(metadata)
+    return jsonify({"message": "Stored successfully"}), 200
 
-    return jsonify(result), 200
 
-@app.route("/api/verify/<int:asset_id>", methods=["POST"]) #NEW
+# ─────────────────────────────
+# VERIFY
+# ─────────────────────────────
+@app.route("/api/verify/<int:asset_id>", methods=["POST"])
 def api_verify(asset_id):
 
     backend_metadata = request.json
-
     result = verify_product(asset_id, backend_metadata)
 
     return jsonify(result), 200
 
-@app.route("/api/transfer-onchain", methods=["POST"]) #NEW
-def api_transfer():
+
+# ─────────────────────────────
+# UPDATE DB AFTER WALLET TRANSFER
+# ─────────────────────────────
+@app.route("/api/transfer", methods=["POST"])
+def transfer_ownership():
 
     data = request.json
 
-    result = transfer_nft(
-        asset_id=int(data["assetId"]),
-        receiver=data["receiver"]
+    token_id = str(data["tokenId"])
+    from_address = data["from"]
+    to_address = data["to"]
+    timestamp = data["timestamp"]
+
+    products_collection.update_one(
+        {"tokenId": token_id},
+        {"$set": {"owner": to_address}}
     )
 
-    return jsonify(result), 200
+    transfers_collection.insert_one({
+        "tokenId": token_id,
+        "from": from_address,
+        "to": to_address,
+        "timestamp": timestamp
+    })
+
+    return jsonify({"message": "Ownership updated in DB"}), 200
 
 
-
-
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)

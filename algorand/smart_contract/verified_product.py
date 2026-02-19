@@ -5,82 +5,71 @@ def approval_program():
     WL_PREFIX = Bytes("WL_")
     PROD_PREFIX = Bytes("PROD_")
 
-    # ─────────────────────────────
-    # On Create
-    # ─────────────────────────────
-    on_create = Seq([
-        App.globalPut(
-            Concat(WL_PREFIX, Global.creator_address()),
-            Int(1)
-        ),
-        Return(Int(1))
-    ])
-
-    is_owner = Txn.sender() == Global.creator_address()
+    is_creator = Txn.sender() == Global.creator_address()
 
     # ─────────────────────────────
-    # Add to Whitelist
+    # On Create (DO NOTHING)
     # ─────────────────────────────
-    add_whitelist = Seq([
-        Assert(is_owner),
-        App.globalPut(
+    on_create = Approve()
+
+    # ─────────────────────────────
+    # Add Whitelist
+    # Args: ["addWL", address]
+    # ─────────────────────────────
+    add_whitelist = Seq(
+        Assert(is_creator),
+        App.box_put(
             Concat(WL_PREFIX, Txn.application_args[1]),
-            Int(1)
+            Bytes("1")
         ),
-        Return(Int(1))
-    ])
+        Approve()
+    )
 
     # ─────────────────────────────
-    # Remove from Whitelist
+    # Remove Whitelist
     # ─────────────────────────────
-    remove_whitelist = Seq([
-        Assert(is_owner),
-        App.globalPut(
-            Concat(WL_PREFIX, Txn.application_args[1]),
-            Int(0)
+    remove_whitelist = Seq(
+        Assert(is_creator),
+        Pop(
+            App.box_delete(
+                Concat(WL_PREFIX, Txn.application_args[1])
+            )
         ),
-        Return(Int(1))
-    ])
+        Approve()
+    )
 
     # ─────────────────────────────
     # Mint Product
+    # Args: ["mint", asset_id_bytes, metadata_hash]
     # ─────────────────────────────
-    mint_product = Seq([
-        # Ensure sender is whitelisted
-        Assert(
-            App.globalGet(
-                Concat(WL_PREFIX, Txn.sender())
-            ) == Int(1)
-        ),
+    mint_product = Seq(
 
-        # Check if box already exists
-        Assert(
-            Not(
-                Seq(
-                    (box := App.box_get(
-                        Concat(PROD_PREFIX, Txn.application_args[1])
-                    )),
-                    box.hasValue()
-                )
-            )
-        ),
+        # Check whitelist
+        (wl := App.box_get(Concat(WL_PREFIX, Txn.sender()))),
+        Assert(wl.hasValue()),
+
+        # Ensure product does not exist
+        (existing := App.box_get(
+            Concat(PROD_PREFIX, Txn.application_args[1])
+        )),
+        Assert(Not(existing.hasValue())),
 
         # Store metadataHash + manufacturer
         App.box_put(
             Concat(PROD_PREFIX, Txn.application_args[1]),
             Concat(
-                Txn.application_args[2],  # 32-byte metadata hash
-                Txn.sender()              # 32-byte manufacturer address
+                Txn.application_args[2],
+                Txn.sender()
             )
         ),
 
-        Return(Int(1))
-    ])
+        Approve()
+    )
 
     handle_noop = Cond(
         [Txn.application_args[0] == Bytes("addWL"), add_whitelist],
         [Txn.application_args[0] == Bytes("removeWL"), remove_whitelist],
-        [Txn.application_args[0] == Bytes("mint"), mint_product]
+        [Txn.application_args[0] == Bytes("mint"), mint_product],
     )
 
     program = Cond(
@@ -92,4 +81,4 @@ def approval_program():
 
 
 def clear_program():
-    return Return(Int(1))
+    return Approve()

@@ -38,7 +38,7 @@ export default function App() {
       {/* PUBLIC ROUTES */}
       {/* -------------------------------- */}
 
-      <Route path="/" element={<Landing />} />
+<Route path="/" element={<Landing />} />
       <Route path="/verify" element={<Verify />} />
 
       {/* -------------------------------- */}

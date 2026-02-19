@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import algosdk from "algosdk"
 import axios from "axios"
 import confetti from "canvas-confetti"
-import { useSearchParams, useNavigate } from "react-router-dom"
+import { useSearchParams, useNavigate, useParams } from "react-router-dom"
 
 const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
@@ -16,15 +16,20 @@ export default function Verify() {
   const [loading, setLoading] = useState(false)
 
   const [searchParams] = useSearchParams()
+  const { assetId: paramId } = useParams()
   const navigate = useNavigate()
 
+  // 🔥 NFC + URL Auto Detect
   useEffect(() => {
-    const id = searchParams.get("assetId")
+    const queryId = searchParams.get("assetId")
+    const id = paramId || queryId
+
     if (id) {
       setAssetId(id)
       verifyProduct(id, "nfc")
+      window.scrollTo(0, 0)
     }
-  }, [])
+  }, [paramId])
 
   const sha256 = async (message) => {
     const msgBuffer = new TextEncoder().encode(message)
@@ -142,7 +147,7 @@ export default function Verify() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* 🔥 NAVBAR */}
+      {/* NAVBAR */}
       <nav className="w-full border-b bg-white px-6 py-4 flex justify-between items-center">
         <h1
           onClick={() => navigate("/")}
@@ -159,7 +164,7 @@ export default function Verify() {
         </button>
       </nav>
 
-      {/* 🔹 MAIN CONTENT */}
+      {/* MAIN */}
       <div className="flex flex-col items-center px-6 py-12">
 
         <h2 className="text-4xl font-bold mb-8 text-center">

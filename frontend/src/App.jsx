@@ -1,51 +1,92 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom"
+import { useState } from "react"
 
-import Landing from "./pages/Landing";
-import ManufacturerLogin from "./pages/ManufacturerLogin";
-import Register from "./pages/RegisterProduct";
-import Verify from "./pages/Verify";
-import Dashboard from "./pages/Dashboard";
-import Transfer from "./pages/TransferOwnership";
-import ManufacturerNavbar from "./components/ManufacturerNavbar";
+import Landing from "./pages/Landing"
+import ManufacturerLogin from "./pages/ManufacturerLogin"
+import Register from "./pages/RegisterProduct"
+import Dashboard from "./pages/Dashboard"
+import TransferOwnership from "./pages/TransferOwnership"
+import ManufacturerNavbar from "./components/ManufacturerNavbar"
+
+import Verify from "./pages/Verify"
+import UserLogin from "./pages/UserLogin"
+import Inventory from "./pages/Inventory"
+import TransferHistory from "./pages/TransferHistory"
 
 export default function App() {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(
+  // -----------------------------
+  // Manufacturer Auth
+  // -----------------------------
+  const [isManufacturerLoggedIn, setIsManufacturerLoggedIn] = useState(
     !!localStorage.getItem("manufacturer")
-  );
+  )
 
-  const [userAddress, setUserAddress] = useState(
+  const [manufacturerAddress, setManufacturerAddress] = useState(
     localStorage.getItem("manufacturer")
-  );
+  )
+
+  // -----------------------------
+  // User Auth
+  // -----------------------------
+  const [userAddress, setUserAddress] = useState(null)
 
   return (
     <Routes>
 
-      {/* Public Routes */}
+      {/* -------------------------------- */}
+      {/* PUBLIC ROUTES */}
+      {/* -------------------------------- */}
+
       <Route path="/" element={<Landing />} />
+      <Route path="/verify" element={<Verify />} />
+
+      {/* -------------------------------- */}
+      {/* USER ROUTES */}
+      {/* -------------------------------- */}
+
+      <Route
+        path="/user-login"
+        element={
+          <UserLogin setUserAddress={setUserAddress} />
+        }
+      />
+
+<Route
+  path="/inventory"
+  element={
+    <Inventory />
+  }
+/>
+
+<Route
+  path="/history/:tokenId"
+  element={
+    <TransferHistory />
+  }
+/>
+
+      {/* -------------------------------- */}
+      {/* MANUFACTURER ROUTES */}
+      {/* -------------------------------- */}
 
       <Route
         path="/manufacturer-login"
         element={
           <ManufacturerLogin
-            setIsLoggedIn={setIsLoggedIn}
-            setUserAddress={setUserAddress}
+            setIsLoggedIn={setIsManufacturerLoggedIn}
+            setUserAddress={setManufacturerAddress}
           />
         }
       />
 
-      <Route path="/verify" element={<Verify />} />
-     
-
-      {/* Protected Register Route */}
       <Route
         path="/register"
         element={
-          isLoggedIn ? (
+          isManufacturerLoggedIn ? (
             <>
               <ManufacturerNavbar />
-              <Register userAddress={userAddress} />
+              <Register userAddress={manufacturerAddress} />
             </>
           ) : (
             <Navigate to="/manufacturer-login" />
@@ -53,14 +94,13 @@ export default function App() {
         }
       />
 
-      {/* Protected Dashboard Route */}
       <Route
         path="/dashboard"
         element={
-          isLoggedIn ? (
+          isManufacturerLoggedIn ? (
             <>
               <ManufacturerNavbar />
-              <Dashboard userAddress={userAddress} />
+              <Dashboard userAddress={manufacturerAddress} />
             </>
           ) : (
             <Navigate to="/manufacturer-login" />
@@ -71,10 +111,10 @@ export default function App() {
       <Route
         path="/transfer"
         element={
-          isLoggedIn ? (
+          isManufacturerLoggedIn ? (
             <>
               <ManufacturerNavbar />
-              <Transfer userAddress={userAddress} />
+              <TransferOwnership />
             </>
           ) : (
             <Navigate to="/manufacturer-login" />
@@ -83,5 +123,5 @@ export default function App() {
       />
 
     </Routes>
-  );
+  )
 }

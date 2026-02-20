@@ -19,17 +19,18 @@ export default function Verify() {
   const { assetId: paramId } = useParams()
   const navigate = useNavigate()
 
-  // 🔥 NFC + URL Auto Detect
+  // ✅ AUTO DETECT NFC OR ROUTE PARAM
   useEffect(() => {
     const queryId = searchParams.get("assetId")
-    const id = paramId || queryId
 
-    if (id) {
-      setAssetId(id)
-      verifyProduct(id, "nfc")
-      window.scrollTo(0, 0)
+    if (paramId) {
+      setAssetId(paramId)
+      verifyProduct(paramId, "nfc")
+    } else if (queryId) {
+      setAssetId(queryId)
+      verifyProduct(queryId, "nfc")
     }
-  }, [paramId])
+  }, [paramId, searchParams])
 
   const sha256 = async (message) => {
     const msgBuffer = new TextEncoder().encode(message)

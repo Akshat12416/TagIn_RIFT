@@ -40,6 +40,7 @@ export default function App() {
 
 <Route path="/" element={<Landing />} />
       <Route path="/v/:assetId" element={<Verify />} />
+      <Route path="/verify" element={<Verify />} />
 
       {/* -------------------------------- */}
       {/* USER ROUTES */}

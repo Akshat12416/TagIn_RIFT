@@ -192,7 +192,7 @@ export default function RegisterProduct() {
           <input name="model" value={form.model} onChange={handleChange} placeholder="Model" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
           <input name="type" value={form.type} onChange={handleChange} placeholder="Product Type" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
           <input name="color" value={form.color} onChange={handleChange} placeholder="Color" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
-          <input name="manufactureDate" value={form.manufactureDate} onChange={handleChange} placeholder="Manufacture Date" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
+          <input name="manufactureDate" type="date" value={form.manufactureDate} onChange={handleChange} placeholder="Manufacture Date" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
 
         </div>
 

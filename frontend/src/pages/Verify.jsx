@@ -112,7 +112,8 @@ export default function Verify() {
 
       setResult({
         isVerified,
-        product
+        product,
+        assetId: id
       })
 
       // 🔹 Log scan
@@ -215,6 +216,18 @@ export default function Verify() {
                 <p className="break-all">
                   <b>Current Owner:</b> {result.product.owner}
                 </p>
+
+                {/* ✅ NEW: Direct Algokit Explorer Link */}
+                <div className="pt-4 border-t">
+                  <a
+                    href={`https://lora.algokit.io/testnet/asset/${result.assetId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-black text-white px-5 py-2 rounded-xl hover:bg-gray-800 transition text-sm"
+                  >
+                    View On Algokit Explorer
+                  </a>
+                </div>
 
               </div>
             )}

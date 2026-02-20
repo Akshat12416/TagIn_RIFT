@@ -1,0 +1,227 @@
+**TagIn RIFT**
+
+NFC-Based Product Authentication & Ownership System on Algorand
+TagIn RIFT is a blockchain-powered product authentication system built on the Algorand blockchain. 
+It enables manufacturers to mint tamper-proof product NFTs, store metadata hashes on-chain, 
+and allow consumers to verify authenticity instantly via NFC tap.
+
+This system eliminates counterfeit products by combining:
+🧾 On-chain metadata hashing
+📦 NFT-based ownership tracking
+📱 NFC-powered instant verification
+🔄 Real time ownership transfer
+🗃️ Backend logging & analytics
+🚀 Live Demo
+
+Frontend:
+👉 https://tag-in-rift.vercel.app
+Backend API:
+👉 https://taginriftbackend1.onrender.com
+
+
+Problem Statement
+
+Counterfeit goods cost global industries billions every year.
+Traditional verification methods:
+Can be forged,
+Rely on centralized databases
+Are difficult for consumers to verify,
+Do not track ownership history
+
+TagIn RIFT solves this by leveraging:
+Algorand blockchain immutability + NFC real-world interaction
+
+🏗️ System Architecture
+Manufacturer → Mint NFT → Store Metadata Hash On-Chain
+                     ↓
+              Store Product in Database
+                     ↓
+        Consumer taps NFC → Opens Verify URL
+                     ↓
+     Frontend Recomputes Hash → Compares On-Chain
+                     ↓
+        If match → Product Verified
+                     ↓
+        Ownership transfers logged on-chain + backend
+
+🔗 Why Algorand?
+TagIn RIFT is built on Algorand Testnet because:
+⚡ 4.5 second finality
+💰 Extremely low transaction fees
+🔐 Native metadataHash support in ASA (Algorand Standard Assets)
+📦 Smart Contract box storage (for product hash storage)
+🌍 Environmentally sustainable blockchain
+
+🛠️ Core Features
+1️⃣ Manufacturer Whitelisting
+Whitelisted manufacturer wallets stored in smart contract box storage
+Only approved wallets can mint verified products
+
+2️⃣ NFT Minting (Algorand ASA)
+Each product:
+Is minted as an Algorand Standard Asset (ASA)
+Has total supply = 1
+metadataHash = SHA-256 of product metadata
+Is owned initially by manufacturer
+
+3️⃣ On-Chain Metadata Protection
+Product metadata is:
+JSON formatted
+Sorted by key
+SHA-256 hashed
+Stored:
+In ASA metadataHash field
+Inside smart contract box storage (PROD_<assetId>)
+This ensures:
+Tamper detection
+Backend integrity verification
+On-chain authenticity guarantee
+
+4️⃣ NFC Tap Verification
+Each product contains an NFC tag with a URL:
+https://tag-in-rift.vercel.app/v/<assetId>
+When tapped:
+Browser opens verify page
+App fetches:
+On-chain stored hash
+Backend product data
+Recomputes hash
+Compares both
+Displays result instantly
+No wallet required for verification.
+
+5️⃣ Ownership Transfer
+Owners can:
+Connect Algorand wallet
+Transfer NFT using Algorand SDK
+Automatically update backend
+View complete transfer history
+All transfers:
+Confirmed on-chain
+Logged in backend database
+Displayed in UI
+
+6️⃣ User Inventory
+Users can:
+Connect wallet
+Fetch ASA holdings directly from Algod
+Display only valid product NFTs
+View transfer history
+Transfer ownership
+
+Tech Stack
+
+Frontend
+React
+React Router
+TailwindCSS
+Algorand SDK (algosdk)
+@txnlab/use-wallet
+Axios
+Canvas Confetti
+
+Deployed on:
+frontend : Vercel
+Backend : render
+Python (Flask)
+MongoDB Atlas 
+Py-Algorand-SDK
+Gunicorn (production server)
+
+Deployed on:
+Render
+Blockchain : Algorand Testnet
+Smart Contract with Box Storage
+ASA NFT minting
+On-chain metadata verification
+
+📂 Project Structure
+frontend/
+  ├── pages/
+  │   ├── Verify.jsx
+  │   ├── RegisterProduct.jsx
+  │   ├── Inventory.jsx
+  │   ├── TransferHistory.jsx
+  │   ├── ManufacturerLogin.jsx
+  │   └── UserLogin.jsx
+  └── App.jsx
+
+backend/
+  ├── app.py
+  ├── routes/
+  ├── models/
+  └── requirements.txt
+
+🔐 Security Design
+Tamper Prevention
+If backend data is altered:
+Recomputed hash ≠ on-chain hash
+Verification fails
+If NFC URL is copied:
+Ownership & metadata still validated on-chain
+If NFT is transferred:
+Ownership reflects real-time wallet holder
+
+📡 API Endpoints
+Method	Endpoint	Purpose
+GET	/api/product/:id	Fetch product
+GET	/api/transfers/:id	Fetch transfer history
+POST	/api/mint	Store new product
+POST	/api/transfer	Log ownership transfer
+POST	/api/scan	Log verification event
+GET	/api/products/:wallet	Manufacturer dashboard
+
+📱 NFC Implementation
+NFC Tag contains:
+https://tag-in-rift.vercel.app/v/<assetId>
+Requirements:
+HTTPS deployment
+Public URL
+URL record format
+Supported:
+Android
+
+iPhone (background NFC URL reading)
+🧪 Running Locally
+Frontend
+npm install
+npm run dev
+Backend
+pip install -r requirements.txt
+python app.py
+🔄 Deployment
+Frontend
+
+Vercel
+Includes vercel.json rewrite rule:
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+}
+
+Backend
+Render
+Gunicorn production server
+
+📈 Future Enhancements
+Anti-cloning NFC chip signatures
+Geo-location scan logging
+Dynamic QR fallback
+Scan analytics dashboard
+Mainnet deployment
+IPFS metadata storage
+Zero-knowledge authenticity proof
+
+🏆 Key Innovations
+Real-world NFC + blockchain integration
+Dual-hash validation (ASA + Smart Contract Box)
+Wallet-less consumer verification
+On-chain + backend sync architecture
+Immutable product lifecycle tracking
+
+👨‍💻 Author
+Akshat Gour, Abharna, Aman Kaushik
+Built with ❤️ on Algorand
+by team Chips
+
+📜 License
+MIT License

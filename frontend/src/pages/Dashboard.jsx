@@ -18,7 +18,6 @@ export default function Dashboard({ userAddress }) {
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Failed to fetch products:", err);
         setLoading(false);
       });
 

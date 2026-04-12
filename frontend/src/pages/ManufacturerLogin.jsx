@@ -30,7 +30,6 @@ export default function ManufacturerLogin() {
       }
 
     } catch (err) {
-      console.error(err)
       setStatus("Login failed")
     }
   }

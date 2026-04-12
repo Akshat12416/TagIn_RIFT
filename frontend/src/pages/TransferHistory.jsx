@@ -29,7 +29,6 @@ export default function TransferHistory() {
       )
       setHistory(res.data || [])
     } catch (err) {
-      console.error("Failed to fetch history:", err)
       toast.error("Failed to load transfer history")
     }
   }
@@ -102,7 +101,6 @@ export default function TransferHistory() {
       fetchHistory()
 
     } catch (err) {
-      console.error(err)
       toast.error("Transfer failed: " + err.message)
     } finally {
       setLoading(false)

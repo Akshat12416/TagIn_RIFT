@@ -87,7 +87,6 @@ const ownedAssetIds = ownedAssets
         setProducts(validProducts)
 
       } catch (err) {
-        console.error("Inventory Fetch Error:", err)
       } finally {
         setLoading(false)
       }

@@ -91,7 +91,6 @@ export default function TransferOwnership() {
       setReceiver("")
 
     } catch (err) {
-      console.error(err)
       toast.error("Transfer failed: " + err.message)
     } finally {
       setLoading(false)

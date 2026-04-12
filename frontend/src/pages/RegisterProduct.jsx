@@ -156,7 +156,6 @@ export default function RegisterProduct() {
       })
 
     } catch (err) {
-      console.error(err)
       toast.error("Registration failed: " + err.message)
     } finally {
       setLoading(false)

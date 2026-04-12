@@ -131,7 +131,6 @@ export default function Verify() {
       }
 
     } catch (err) {
-      console.error(err)
       setError("Verification failed")
     } finally {
       setLoading(false)

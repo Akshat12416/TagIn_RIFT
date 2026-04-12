@@ -9,6 +9,8 @@ import "react-toastify/dist/ReactToastify.css"
 const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
 
+const shortAddr = (addr) => addr ? `${addr.slice(0, 8)}...${addr.slice(-6)}` : ""
+
 export default function TransferHistory() {
 
   const { tokenId } = useParams()
@@ -86,7 +88,6 @@ export default function TransferHistory() {
         throw new Error(pendingInfo["pool-error"])
       }
 
-      // Update backend
       await axios.post("https://taginriftbackend1.onrender.com/api/transfer", {
         tokenId: tokenId,
         from: activeAccount.address,
@@ -96,7 +97,6 @@ export default function TransferHistory() {
       })
 
       toast.success("Ownership transferred successfully!")
-
       setReceiver("")
       fetchHistory()
 
@@ -108,53 +108,85 @@ export default function TransferHistory() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-10">
+    <div className="min-h-screen bg-black text-white px-6 py-12 font-['ClashDisplay']">
 
-      <h1 className="text-3xl font-bold mb-8">
-        Transfer History - {tokenId}
-      </h1>
+      <div className="max-w-3xl mx-auto space-y-8">
 
-      {/* HISTORY SECTION */}
-      <div className="space-y-4 mb-10">
-        {history.length === 0 ? (
-          <p className="text-gray-500">No transfer records found.</p>
-        ) : (
-          history.map((h, i) => (
-            <div key={i} className="border p-4 rounded-xl">
-              <p><b>From:</b> {h.from}</p>
-              <p><b>To:</b> {h.to}</p>
-              <p><b>Date:</b> {new Date(h.timestamp).toLocaleString()}</p>
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold tracking-wide mb-1">Transfer History</h1>
+          <p className="text-white/40 font-mono text-sm">Token ID: {tokenId}</p>
+        </div>
+
+        {/* History Timeline */}
+        <div className="bg-[#111111] border border-white/10 rounded-3xl p-8 space-y-4">
+          <h2 className="text-lg font-semibold text-white/70 mb-6 tracking-wide uppercase text-sm">Ownership Chain</h2>
+          {history.length === 0 ? (
+            <p className="text-white/30 py-6 text-center">No transfer records found.</p>
+          ) : (
+            <div className="relative">
+              <div className="absolute left-4 top-0 bottom-0 w-px bg-white/10"></div>
+              <div className="space-y-6 pl-10">
+                {history.map((h, i) => (
+                  <div key={i} className="relative">
+                    <div className="absolute -left-[22px] w-3 h-3 rounded-full bg-[#5282E1] border-2 border-black mt-1"></div>
+                    <div className="bg-white/5 border border-white/5 hover:border-white/10 rounded-2xl p-5 transition">
+                      <p className="text-xs text-white/30 mb-3">
+                        {new Date(h.timestamp).toLocaleString()}
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs uppercase tracking-widest text-white/40 w-8">From</span>
+                          <span className="font-mono text-sm text-white/70">{shortAddr(h.from)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs uppercase tracking-widest text-[#5282E1] w-8">To</span>
+                          <span className="font-mono text-sm text-white">{shortAddr(h.to)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))
-        )}
+          )}
+        </div>
+
+        {/* Transfer Section */}
+        <div className="bg-[#111111] border border-white/10 rounded-3xl p-8 space-y-5 relative overflow-hidden">
+          <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-[#5282E1]/10 rounded-full blur-[60px] pointer-events-none"></div>
+
+          <h2 className="text-xl font-semibold tracking-wide relative z-10">Transfer Ownership</h2>
+
+          <input
+            value={receiver}
+            onChange={(e) => setReceiver(e.target.value)}
+            placeholder="Receiver Algorand Address..."
+            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 px-4 py-3 rounded-xl focus:outline-none focus:border-[#5282E1] focus:ring-1 focus:ring-[#5282E1] font-mono text-sm transition relative z-10"
+          />
+
+          <button
+            onClick={handleTransfer}
+            disabled={loading}
+            className="w-full bg-[#5282E1] hover:bg-[#3d68bc] disabled:opacity-50 text-white py-3 rounded-2xl font-medium tracking-wide transition shadow-[0_0_15px_rgba(82,130,225,0.3)] relative z-10"
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-3">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                Transferring...
+              </span>
+            ) : "Transfer"}
+          </button>
+        </div>
+
       </div>
 
-      {/* TRANSFER SECTION */}
-      <div className="border p-6 rounded-2xl space-y-4">
-
-        <h2 className="text-xl font-semibold">
-          Transfer Ownership
-        </h2>
-
-        <input
-          value={receiver}
-          onChange={(e) => setReceiver(e.target.value)}
-          placeholder="Receiver Address"
-          className="w-full border px-4 py-3 rounded-xl font-mono text-sm"
-        />
-
-        <button
-          onClick={handleTransfer}
-          disabled={loading}
-          className="w-full bg-black text-white py-3 rounded-xl disabled:opacity-50"
-        >
-          {loading ? "Transferring..." : "Transfer"}
-        </button>
-
-      </div>
-
-      <ToastContainer position="top-right" autoClose={3000} />
-
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        theme="dark"
+        toastStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+      />
     </div>
   )
 }

@@ -99,73 +99,76 @@ const ownedAssetIds = ownedAssets
   // 🔥 Protect page if wallet not connected
   if (!activeAccount?.address) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <button
-          onClick={() => navigate("/user-login")}
-          className="bg-black text-white px-6 py-3 rounded-xl"
-        >
-          Connect Wallet First
-        </button>
+      <div className="min-h-screen bg-black flex items-center justify-center font-['ClashDisplay']">
+        <div className="text-center space-y-4">
+          <p className="text-white/60 text-lg">Wallet not connected</p>
+          <button
+            onClick={() => navigate("/user-login")}
+            className="bg-[#5282E1] hover:bg-[#3d68bc] text-white px-8 py-3 rounded-2xl font-medium transition shadow-[0_0_20px_rgba(82,130,225,0.4)]"
+          >
+            Connect Wallet First
+          </button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6 md:p-8 lg:p-12">
+    <div className="min-h-screen bg-black text-white p-6 md:p-8 lg:p-12 font-['ClashDisplay']">
 
       <div className="max-w-7xl mx-auto">
 
-        <div className="mb-8">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-black">
+        <div className="mb-10">
+          <h2 className="text-3xl md:text-4xl font-extrabold tracking-wide">
             Your Inventory
           </h2>
-          <p className="text-xs font-mono text-gray-500 break-all mt-2">
+          <p className="text-xs font-mono text-white/40 break-all mt-2">
             {activeAccount.address}
           </p>
         </div>
 
         {loading ? (
-          <div className="bg-white rounded-3xl border border-gray-200 shadow-xl p-12 text-center">
-            <p className="text-gray-500 text-lg animate-pulse">
-              Fetching your NFTs...
-            </p>
+          <div className="flex justify-center items-center py-32">
+            <div className="w-12 h-12 border-4 border-white/10 border-t-[#5282E1] rounded-full animate-spin"></div>
           </div>
         ) : products.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-gray-200 shadow-xl p-12 text-center">
-            <p className="text-gray-500 text-lg">
-              No verified products found in your wallet.
-            </p>
+          <div className="bg-[#111111] border border-white/10 rounded-3xl p-16 text-center">
+            <p className="text-white/40 text-lg">No verified products found in your wallet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map(product => (
               <div
                 key={product.tokenId}
-                className="bg-white border border-gray-200 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+                className="bg-[#111111] border border-white/10 hover:border-[#5282E1]/40 p-6 rounded-3xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(82,130,225,0.15)] relative overflow-hidden group"
               >
-                <h3 className="text-2xl font-bold mb-4 text-black">
-                  {product.product_name}
-                </h3>
+                {/* Card glow */}
+                <div className="absolute -top-8 -right-8 w-32 h-32 bg-[#5282E1]/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-2 h-2 rounded-full bg-[#5282E1]"></div>
+                  <h3 className="text-lg font-bold tracking-wide truncate">
+                    {product.product_name}
+                  </h3>
+                </div>
 
                 <div className="space-y-2 mb-6">
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-xl">
-                    <span className="font-semibold text-sm">Token ID:</span>
-                    <span className="text-sm font-mono">{product.tokenId}</span>
+                  <div className="flex justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-white/50 text-sm">Token ID</span>
+                    <span className="text-sm font-mono text-white/90">{product.tokenId}</span>
                   </div>
-
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-xl">
-                    <span className="font-semibold text-sm">Model:</span>
-                    <span className="text-sm">{product.model}</span>
+                  <div className="flex justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-white/50 text-sm">Model</span>
+                    <span className="text-sm text-white/90">{product.model}</span>
                   </div>
-
-                  <div className="flex justify-between p-3 bg-gray-50 rounded-xl">
-                    <span className="font-semibold text-sm">Serial:</span>
-                    <span className="text-sm">{product.serial_number}</span>
+                  <div className="flex justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-white/50 text-sm">Serial</span>
+                    <span className="text-sm text-white/90">{product.serial_number}</span>
                   </div>
                 </div>
 
                 <button
-                  className="w-full bg-black hover:bg-gray-900 text-white px-6 py-3 rounded-2xl shadow-xl transition-all font-medium"
+                  className="w-full bg-white/10 hover:bg-[#5282E1] border border-white/10 hover:border-[#5282E1] text-white px-6 py-3 rounded-2xl transition-all font-medium tracking-wide relative z-10"
                   onClick={() => navigate(`/history/${product.tokenId}`)}
                 >
                   View Transfer History

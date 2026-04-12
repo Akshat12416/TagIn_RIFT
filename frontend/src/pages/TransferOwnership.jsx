@@ -2,9 +2,9 @@ import React, { useState } from "react"
 import algosdk from "algosdk"
 import axios from "axios"
 import { useWallet } from "@txnlab/use-wallet-react"
-import { WalletButton } from "@txnlab/use-wallet-ui-react"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import CustomWalletButton from "../components/CustomWalletButton"
 
 const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
@@ -45,7 +45,6 @@ export default function TransferOwnership() {
 
       const params = await algodClient.getTransactionParams().do()
 
-      // 🔥 Create Transfer Transaction
       const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
         sender: activeAccount.address,
         receiver: receiver,
@@ -54,14 +53,11 @@ export default function TransferOwnership() {
         suggestedParams: params
       })
 
-      // 🔥 Sign via wallet
       const signedTxns = await signTransactions([txn])
 
-      // 🔥 Send to blockchain
       const { txid } = await algodClient
         .sendRawTransaction(signedTxns[0])
         .do()
-
 
       await algosdk.waitForConfirmation(algodClient, txid, 10)
 
@@ -72,10 +68,6 @@ export default function TransferOwnership() {
       if (pendingInfo["pool-error"] && pendingInfo["pool-error"].length > 0) {
         throw new Error(pendingInfo["pool-error"])
       }
-
-      // =====================================================
-      // 🔥 AFTER CONFIRMATION → UPDATE DATABASE
-      // =====================================================
 
       await axios.post("https://taginriftbackend1.onrender.com/api/transfer", {
         tokenId: assetId,
@@ -97,43 +89,48 @@ export default function TransferOwnership() {
     }
   }
 
+  const inputClass = "w-full bg-white/5 border border-white/10 text-white placeholder-white/30 px-4 py-3 rounded-xl focus:outline-none focus:border-[#5282E1] focus:ring-1 focus:ring-[#5282E1] transition"
+
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6 font-['ClashDisplay'] text-white">
 
       <div className="w-full max-w-2xl">
 
-        <div className="flex justify-end mb-6">
-          <WalletButton />
+        <div className="flex justify-end mb-8">
+          <CustomWalletButton />
         </div>
 
-        <h1 className="text-4xl font-semibold text-center mb-8">
-          Transfer Ownership
-        </h1>
+        <div className="bg-[#111111] border border-white/10 rounded-3xl p-10 space-y-7 relative overflow-hidden">
 
-        <div className="bg-neutral-100 p-8 rounded-2xl border space-y-6">
+          {/* Glow */}
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#5282E1]/10 rounded-full blur-[80px] pointer-events-none"></div>
 
-          <div>
-            <label className="block mb-2 text-sm font-medium">
+          <h1 className="text-3xl font-semibold tracking-wide relative z-10">
+            Transfer Ownership
+          </h1>
+
+          <div className="relative z-10">
+            <label className="block mb-2 text-sm text-white/50 tracking-wide">
               Asset ID
             </label>
             <input
               type="number"
               value={assetId}
               onChange={(e) => setAssetId(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border"
+              className={inputClass}
               placeholder="Enter Asset ID"
             />
           </div>
 
-          <div>
-            <label className="block mb-2 text-sm font-medium">
+          <div className="relative z-10">
+            <label className="block mb-2 text-sm text-white/50 tracking-wide">
               Receiver Wallet Address
             </label>
             <input
               type="text"
               value={receiver}
               onChange={(e) => setReceiver(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border font-mono"
+              className={`${inputClass} font-mono`}
               placeholder="Algorand address..."
             />
           </div>
@@ -141,16 +138,25 @@ export default function TransferOwnership() {
           <button
             onClick={handleTransfer}
             disabled={loading}
-            className="w-full bg-black text-white py-4 rounded-2xl font-semibold disabled:opacity-50"
+            className="w-full bg-[#5282E1] hover:bg-[#3d68bc] disabled:opacity-50 text-white py-4 rounded-2xl font-semibold tracking-wide transition shadow-[0_0_20px_rgba(82,130,225,0.3)] relative z-10"
           >
-            {loading ? "Transferring..." : "Transfer NFT"}
+            {loading ? (
+              <span className="flex items-center justify-center gap-3">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                Transferring...
+              </span>
+            ) : "Transfer NFT"}
           </button>
 
         </div>
       </div>
 
-      <ToastContainer position="top-right" autoClose={3000} />
-
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        theme="dark"
+        toastStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+      />
     </div>
   )
 }

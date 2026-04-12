@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { useWallet } from "@txnlab/use-wallet-react"
-import { WalletButton } from "@txnlab/use-wallet-ui-react"
 import algosdk from "algosdk"
 import axios from "axios"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import CustomWalletButton from "../components/CustomWalletButton"
 
 const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
@@ -39,7 +39,6 @@ export default function RegisterProduct() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  // 🔥 Fill Demo Data Function
   const handleFillDemo = () => {
     setForm(DEMO_DATA)
     toast.info("Demo data filled")
@@ -117,9 +116,9 @@ export default function RegisterProduct() {
         appIndex: APP_ID,
         suggestedParams: params,
         appArgs: [
-          new Uint8Array([210, 186, 254, 49]), // ARC-4 ABI selector for mint(byte[],byte[])void
-          new Uint8Array([0, 8, ...algosdk.encodeUint64(assetId)]), // uint16 length-prefixed byte[] 
-          new Uint8Array([0, 32, ...metadataHash]) // uint16 length-prefixed byte[]
+          new Uint8Array([210, 186, 254, 49]),
+          new Uint8Array([0, 8, ...algosdk.encodeUint64(assetId)]),
+          new Uint8Array([0, 32, ...metadataHash])
         ],
         boxes: [
           { appIndex: APP_ID, name: wlBoxName },
@@ -162,49 +161,63 @@ export default function RegisterProduct() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-100 px-6 py-10">
+  const inputClass = "w-full bg-white/5 border border-white/10 text-white placeholder-white/30 px-4 py-3 rounded-xl focus:outline-none focus:border-[#5282E1] focus:ring-1 focus:ring-[#5282E1] transition"
 
-      <div className="flex justify-end mb-6">
-        <WalletButton />
+  return (
+    <div className="min-h-screen bg-black text-white px-6 py-10 font-['ClashDisplay']">
+
+      {/* Top bar */}
+      <div className="flex justify-end mb-8 max-w-4xl mx-auto">
+        <CustomWalletButton />
       </div>
 
-      <div className="max-w-3xl mx-auto bg-white shadow-xl border border-gray-200 p-10 rounded-3xl space-y-6">
+      <div className="max-w-3xl mx-auto bg-[#111111] border border-white/10 p-10 rounded-3xl space-y-6 relative overflow-hidden">
 
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-semibold">
+        {/* Glow */}
+        <div className="absolute -top-32 -right-32 w-72 h-72 bg-[#5282E1]/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div className="flex justify-between items-center relative z-10">
+          <h1 className="text-3xl font-semibold tracking-wide">
             Register Product
           </h1>
 
           <button
             onClick={handleFillDemo}
-            className="bg-gray-200 hover:bg-gray-300 text-sm px-4 py-2 rounded-xl transition"
+            className="bg-white/5 hover:bg-white/10 border border-white/10 text-sm px-4 py-2 rounded-xl transition text-white/70 hover:text-white"
           >
             Fill Demo Data
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          <input name="name" value={form.name} onChange={handleChange} placeholder="Product Name" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
-          <input name="serial" value={form.serial} onChange={handleChange} placeholder="Serial Number" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
-          <input name="model" value={form.model} onChange={handleChange} placeholder="Model" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
-          <input name="type" value={form.type} onChange={handleChange} placeholder="Product Type" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
-          <input name="color" value={form.color} onChange={handleChange} placeholder="Color" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
-          <input name="manufactureDate" type="date" value={form.manufactureDate} onChange={handleChange} placeholder="Manufacture Date" className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-black outline-none" />
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+          <input name="name" value={form.name} onChange={handleChange} placeholder="Product Name" className={inputClass} />
+          <input name="serial" value={form.serial} onChange={handleChange} placeholder="Serial Number" className={inputClass} />
+          <input name="model" value={form.model} onChange={handleChange} placeholder="Model" className={inputClass} />
+          <input name="type" value={form.type} onChange={handleChange} placeholder="Product Type" className={inputClass} />
+          <input name="color" value={form.color} onChange={handleChange} placeholder="Color" className={inputClass} />
+          <input name="manufactureDate" type="date" value={form.manufactureDate} onChange={handleChange} placeholder="Manufacture Date" className={`${inputClass} [color-scheme:dark]`} />
         </div>
 
         <button
           onClick={handleRegister}
           disabled={loading}
-          className="w-full bg-black hover:bg-gray-900 text-white py-4 rounded-2xl font-semibold transition shadow-md"
+          className="w-full bg-[#5282E1] hover:bg-[#3d68bc] disabled:opacity-50 text-white py-4 rounded-2xl font-semibold tracking-wide transition shadow-[0_0_20px_rgba(82,130,225,0.3)] relative z-10"
         >
-          {loading ? "Registering..." : "Register Product"}
+          {loading ? (
+            <span className="flex items-center justify-center gap-3">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              Registering...
+            </span>
+          ) : "Register Product"}
         </button>
       </div>
 
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        theme="dark"
+        toastStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+      />
     </div>
   )
 }

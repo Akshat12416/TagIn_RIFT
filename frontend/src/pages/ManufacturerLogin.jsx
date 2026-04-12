@@ -1,8 +1,8 @@
 import { useWallet } from "@txnlab/use-wallet-react"
-import { WalletButton } from "@txnlab/use-wallet-ui-react"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import axios from "axios"
+import CustomWalletButton from "../components/CustomWalletButton"
 
 export default function ManufacturerLogin() {
 
@@ -35,35 +35,35 @@ export default function ManufacturerLogin() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 px-6">
+    <div className="min-h-screen flex items-center justify-center bg-black px-6 text-white font-['ClashDisplay']">
 
-      <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md border border-gray-200">
+      <div className="bg-[#111111] p-10 rounded-3xl shadow-xl w-full max-w-md border border-white/10 relative overflow-hidden">
 
-        <h1 className="text-2xl font-semibold mb-2 text-center tracking-wide">
+        {/* Glow effect */}
+        <div className="absolute -top-32 -right-32 w-64 h-64 bg-[#5282E1]/20 rounded-full blur-[80px] pointer-events-none"></div>
+
+        <h1 className="text-3xl font-semibold mb-2 text-center tracking-wide relative z-10">
           Manufacturer Login
         </h1>
 
-        <p className="text-center text-sm text-gray-500 mb-8">
+        <p className="text-center text-sm text-white/50 mb-8 tracking-wide relative z-10">
           Connect your Algorand wallet to continue
         </p>
 
         {/* Wallet Connect Section */}
-        <div className="flex justify-center mb-8">
-        <div className="flex justify-center mb-8">
-        <WalletButton className="!bg-black !text-white !rounded-2xl !px-6 !py-3 hover:!bg-gray-900 transition" />
-        </div>
-
+        <div className="flex justify-center mb-8 relative z-10">
+          <CustomWalletButton />
         </div>
 
         <button
           onClick={handleLogin}
-          className="w-full bg-black hover:bg-gray-900 transition text-white py-3 rounded-2xl font-medium shadow-md"
+          className="w-full bg-[#5282E1] hover:bg-[#3d68bc] transition text-white py-3 rounded-2xl font-medium tracking-wide shadow-[0_0_15px_rgba(82,130,225,0.3)] relative z-10"
         >
           Continue
         </button>
 
         {status && (
-          <p className="text-center text-sm mt-6 text-red-500">
+          <p className="text-center text-sm mt-6 text-[#ef4444] bg-white/5 py-2 rounded-xl border border-red-500/20 relative z-10">
             {status}
           </p>
         )}

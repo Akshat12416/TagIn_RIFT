@@ -117,9 +117,9 @@ export default function RegisterProduct() {
         appIndex: APP_ID,
         suggestedParams: params,
         appArgs: [
-          new TextEncoder().encode("mint"),
-          algosdk.encodeUint64(assetId),
-          metadataHash
+          new Uint8Array([210, 186, 254, 49]), // ARC-4 ABI selector for mint(byte[],byte[])void
+          new Uint8Array([0, 8, ...algosdk.encodeUint64(assetId)]), // uint16 length-prefixed byte[] 
+          new Uint8Array([0, 32, ...metadataHash]) // uint16 length-prefixed byte[]
         ],
         boxes: [
           { appIndex: APP_ID, name: wlBoxName },

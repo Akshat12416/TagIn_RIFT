@@ -62,7 +62,6 @@ export default function TransferOwnership() {
         .sendRawTransaction(signedTxns[0])
         .do()
 
-      console.log("Transfer TxID:", txid)
 
       await algosdk.waitForConfirmation(algodClient, txid, 10)
 

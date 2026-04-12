@@ -19,15 +19,12 @@ export default function Inventory() {
 
     const fetchInventory = async () => {
 
-      console.log("===== INVENTORY DEBUG START =====")
 
       if (!activeAccount?.address) {
-        console.log("No wallet connected")
         setLoading(false)
         return
       }
 
-      console.log("Connected Wallet:", activeAccount.address)
 
       try {
 
@@ -42,17 +39,14 @@ export default function Inventory() {
           .accountInformation(activeAccount.address)
           .do()
 
-        console.log("Full Account Info:", accountInfo)
 
         const ownedAssets = accountInfo.assets || []
 
-        console.log("All Assets in Wallet:", ownedAssets)
 
         // 🔥 2️⃣ Filter assets with amount > 0
 const ownedAssetIds = ownedAssets
   .filter(asset => asset.amount > 0n) // BigInt comparison
   .map(asset => {
-    console.log("Asset Object:", asset)
 
     const id = asset["asset-id"] || asset.assetId
 
@@ -62,10 +56,8 @@ const ownedAssetIds = ownedAssets
   .filter(id => !isNaN(id))
 
 
-        console.log("Filtered Owned Asset IDs:", ownedAssetIds)
 
         if (ownedAssetIds.length === 0) {
-          console.log("No assets with balance > 0")
           setProducts([])
           setLoading(false)
           return
@@ -75,18 +67,15 @@ const ownedAssetIds = ownedAssets
         const backendProducts = await Promise.all(
           ownedAssetIds.map(async (id) => {
             try {
-              console.log("Fetching backend product for Asset ID:", id)
 
               const res = await axios.get(
                 `https://taginriftbackend1.onrender.com/api/product/${id}`
               )
 
-              console.log("Backend Response for", id, ":", res.data)
 
               return res.data
 
             } catch (err) {
-              console.log("No backend product found for asset:", id)
               return null
             }
           })
@@ -94,7 +83,6 @@ const ownedAssetIds = ownedAssets
 
         const validProducts = backendProducts.filter(p => p !== null)
 
-        console.log("Final Valid Products:", validProducts)
 
         setProducts(validProducts)
 
@@ -102,7 +90,6 @@ const ownedAssetIds = ownedAssets
         console.error("Inventory Fetch Error:", err)
       } finally {
         setLoading(false)
-        console.log("===== INVENTORY DEBUG END =====")
       }
     }
 

@@ -8,7 +8,7 @@ load_dotenv()
 
 ALGOD_ADDRESS = "https://testnet-api.algonode.cloud"
 ALGOD_TOKEN = ""
-APP_ID = 755785502   # your app id
+APP_ID = 758713172   # your app id
 
 algod_client = algod.AlgodClient(ALGOD_TOKEN, ALGOD_ADDRESS)
 

@@ -29,7 +29,8 @@ pycryptodomex==3.23.0
 pymongo==4.16.0
 PyNaCl==1.6.2
 PySocks==1.7.1
-pyteal==0.27.0
+algorand-python
+algokit-utils
 python-dotenv==1.2.1
 requests==2.32.5
 requests-file==3.0.1

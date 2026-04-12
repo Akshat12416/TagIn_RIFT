@@ -6,7 +6,7 @@ import { useSearchParams, useNavigate, useParams } from "react-router-dom"
 
 const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
-const APP_ID = 755785502
+const APP_ID = 758713172
 
 export default function Verify() {
 

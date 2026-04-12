@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css"
 
 const ALGOD_SERVER = "https://testnet-api.algonode.cloud"
 const ALGOD_TOKEN = ""
-const APP_ID = 755785502   
+const APP_ID = 758713172   
 
 // 🔥 Hardcoded Demo Data
 const DEMO_DATA = {

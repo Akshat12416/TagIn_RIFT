@@ -1,0 +1,159 @@
+#pragma version 11
+#pragma typetrack false
+
+// algopy.arc4.ARC4Contract.approval_program() -> uint64:
+main:
+    intcblock 1 32 0 2
+    bytecblock "WL_"
+    // algorand/smart_contract/contract.py:3
+    // class VerifiedProduct(ARC4Contract):
+    txn NumAppArgs
+    bz main___algopy_default_create@12
+    txn OnCompletion
+    !
+    assert
+    txn ApplicationID
+    assert
+    pushbytess 0x21a62b9b 0x85fce28b 0xd2bafe31 // method "addWL(address)void", method "removeWL(address)void", method "mint(byte[],byte[])void"
+    txna ApplicationArgs 0
+    match addWL removeWL mint
+    err
+
+main___algopy_default_create@12:
+    txn OnCompletion
+    !
+    txn ApplicationID
+    !
+    &&
+    return
+
+
+// contract.VerifiedProduct.addWL[routing]() -> void:
+addWL:
+    // algorand/smart_contract/contract.py:8
+    // @arc4.abimethod
+    txna ApplicationArgs 1
+    dup
+    len
+    intc_1 // 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    // algorand/smart_contract/contract.py:10
+    // assert Txn.sender == Global.creator_address, "Only creator can add to whitelist"
+    txn Sender
+    global CreatorAddress
+    ==
+    assert // Only creator can add to whitelist
+    // algorand/smart_contract/contract.py:11
+    // self.whitelist[address] = String("1")
+    bytec_0 // "WL_"
+    swap
+    concat
+    dup
+    box_del
+    pop
+    pushbytes "1"
+    box_put
+    // algorand/smart_contract/contract.py:8
+    // @arc4.abimethod
+    intc_0 // 1
+    return
+
+
+// contract.VerifiedProduct.removeWL[routing]() -> void:
+removeWL:
+    // algorand/smart_contract/contract.py:13
+    // @arc4.abimethod
+    txna ApplicationArgs 1
+    dup
+    len
+    intc_1 // 32
+    ==
+    assert // invalid number of bytes for arc4.static_array<arc4.uint8, 32>
+    // algorand/smart_contract/contract.py:15
+    // assert Txn.sender == Global.creator_address, "Only creator can remove from whitelist"
+    txn Sender
+    global CreatorAddress
+    ==
+    assert // Only creator can remove from whitelist
+    // algorand/smart_contract/contract.py:16
+    // if address in self.whitelist:
+    bytec_0 // "WL_"
+    swap
+    concat
+    dup
+    box_len
+    bury 1
+    bz removeWL_after_if_else@3
+    // algorand/smart_contract/contract.py:17
+    // del self.whitelist[address]
+    dup
+    box_del
+    pop
+
+removeWL_after_if_else@3:
+    // algorand/smart_contract/contract.py:13
+    // @arc4.abimethod
+    intc_0 // 1
+    return
+
+
+// contract.VerifiedProduct.mint[routing]() -> void:
+mint:
+    // algorand/smart_contract/contract.py:19
+    // @arc4.abimethod
+    txna ApplicationArgs 1
+    dup
+    intc_2 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_3 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    extract 2 0
+    txna ApplicationArgs 2
+    dup
+    intc_2 // 0
+    extract_uint16 // on error: invalid array length header
+    intc_3 // 2
+    +
+    dig 1
+    len
+    ==
+    assert // invalid number of bytes for arc4.dynamic_array<arc4.uint8>
+    extract 2 0
+    // algorand/smart_contract/contract.py:21
+    // assert Txn.sender in self.whitelist, "Sender not in whitelist"
+    bytec_0 // "WL_"
+    txn Sender
+    concat
+    box_len
+    bury 1
+    assert // Sender not in whitelist
+    // algorand/smart_contract/contract.py:22
+    // assert asset_id_bytes not in self.products, "Product already exists"
+    pushbytes "PROD_"
+    uncover 2
+    concat
+    dup
+    box_len
+    bury 1
+    !
+    assert // Product already exists
+    // algorand/smart_contract/contract.py:24-25
+    // # Store metadataHash (32 bytes) + manufacturer account bytes (32 bytes)
+    // self.products[asset_id_bytes] = metadata_hash + Txn.sender.bytes
+    txn Sender
+    uncover 2
+    swap
+    concat
+    dig 1
+    box_del
+    pop
+    box_put
+    // algorand/smart_contract/contract.py:19
+    // @arc4.abimethod
+    intc_0 // 1
+    return

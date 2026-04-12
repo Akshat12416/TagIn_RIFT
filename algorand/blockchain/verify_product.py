@@ -13,7 +13,7 @@ ALGOD_TOKEN = ""
 INDEXER_ADDRESS = "https://testnet-idx.algonode.cloud"
 INDEXER_TOKEN = ""
 
-APP_ID = 755771651
+APP_ID = 758713172
 ASSET_ID = 755772786  # replace if needed
 
 algod_client = algod.AlgodClient(ALGOD_TOKEN, ALGOD_ADDRESS)

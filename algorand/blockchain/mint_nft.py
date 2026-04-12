@@ -10,7 +10,7 @@ load_dotenv()
 ALGOD_ADDRESS = "https://testnet-api.algonode.cloud"
 ALGOD_TOKEN = ""
 
-APP_ID = 755771651  # <-- replace
+APP_ID = 758713172  # <-- replace
 
 algod_client = algod.AlgodClient(ALGOD_TOKEN, ALGOD_ADDRESS)
 
@@ -73,32 +73,35 @@ def create_nft(metadata_hash):
     return asset_id
 
 
+from algosdk.abi import Method
+from algosdk.atomic_transaction_composer import AtomicTransactionComposer, AccountTransactionSigner
+
+signer = AccountTransactionSigner(private_key)
+
 # ─────────────────────────────
 # STEP 3: Register in Smart Contract
 # ─────────────────────────────
 def register_product(asset_id, metadata_hash):
 
     params = algod_client.suggested_params()
+    atc = AtomicTransactionComposer()
+    
+    method = Method.from_signature("mint(byte[],byte[])void")
 
-    txn = transaction.ApplicationNoOpTxn(
+    atc.add_method_call(
+        app_id=APP_ID,
+        method=method,
         sender=sender,
         sp=params,
-        index=APP_ID,
-        app_args=[
-            b"mint",
-            asset_id.to_bytes(8, "big"),
-            metadata_hash
-        ],
+        signer=signer,
+        method_args=[asset_id.to_bytes(8, "big"), metadata_hash],
         boxes=[
             (APP_ID, b"PROD_" + asset_id.to_bytes(8, "big"))
         ]
     )
 
-    signed_txn = txn.sign(private_key)
-    txid = algod_client.send_transaction(signed_txn)
-
     print("Registering product in contract...")
-    transaction.wait_for_confirmation(algod_client, txid, 4)
+    atc.execute(algod_client, 4)
     print("✅ Product Registered On-Chain")
 
 

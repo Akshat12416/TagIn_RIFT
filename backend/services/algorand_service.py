@@ -62,30 +62,34 @@ def create_nft(metadata_hash: bytes):
     return result["asset-index"]
 
 
+from algosdk.abi import Method
+from algosdk.atomic_transaction_composer import AtomicTransactionComposer, AccountTransactionSigner
+
+signer = AccountTransactionSigner(private_key)
+
 # ─────────────────────────────
 # REGISTER PRODUCT IN BOX
 # ─────────────────────────────
 def register_product(asset_id: int, metadata_hash: bytes):
 
     params = algod_client.suggested_params()
+    atc = AtomicTransactionComposer()
+    
+    method = Method.from_signature("mint(byte[],byte[])void")
 
-    txn = transaction.ApplicationNoOpTxn(
+    atc.add_method_call(
+        app_id=APP_ID,
+        method=method,
         sender=sender,
         sp=params,
-        index=APP_ID,
-        app_args=[
-            b"mint",
-            asset_id.to_bytes(8, "big"),
-            metadata_hash
-        ],
+        signer=signer,
+        method_args=[asset_id.to_bytes(8, "big"), metadata_hash],
         boxes=[
             (APP_ID, b"PROD_" + asset_id.to_bytes(8, "big"))
         ]
     )
 
-    signed_txn = txn.sign(private_key)
-    txid = algod_client.send_transaction(signed_txn)
-    transaction.wait_for_confirmation(algod_client, txid, 4)
+    atc.execute(algod_client, 4)
 
 
 # ─────────────────────────────
@@ -191,19 +195,19 @@ def is_whitelisted(address: str):
 def add_manufacturer(address: str):
 
     params = algod_client.suggested_params()
+    atc = AtomicTransactionComposer()
+    
+    method = Method.from_signature("addWL(address)void")
 
-    txn = transaction.ApplicationNoOpTxn(
+    atc.add_method_call(
+        app_id=APP_ID,
+        method=method,
         sender=sender,
         sp=params,
-        index=APP_ID,
-        app_args=[b"add_manufacturer"],
-        boxes=[
-            (APP_ID, b"WHITELIST_" + address.encode())
-        ]
+        signer=signer,
+        method_args=[address]
     )
 
-    signed_txn = txn.sign(private_key)
-    txid = algod_client.send_transaction(signed_txn)
-    transaction.wait_for_confirmation(algod_client, txid, 4)
+    atc.execute(algod_client, 4)
 
     return {"message": "Manufacturer added on-chain"}

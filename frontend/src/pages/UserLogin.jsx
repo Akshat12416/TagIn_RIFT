@@ -4,45 +4,36 @@ import { useNavigate } from "react-router-dom"
 import CustomWalletButton from "../components/CustomWalletButton"
 
 export default function UserLogin() {
-
   const { activeAccount } = useWallet()
   const navigate = useNavigate()
 
-  const handleContinue = () => {
-    if (!activeAccount?.address) return
-    navigate("/inventory")
-  }
-
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-6 text-white font-['ClashDisplay']">
+    <div className="min-h-screen bg-black flex items-center justify-center px-6">
+      <div className="w-full max-w-sm text-center">
 
-      <div className="w-full max-w-md bg-[#111111] border border-white/10 p-10 rounded-3xl shadow-xl text-center space-y-6 relative overflow-hidden">
-        
-        {/* Glow effect */}
-        <div className="absolute -top-32 -left-32 w-64 h-64 bg-[#5282E1]/20 rounded-full blur-[80px] pointer-events-none"></div>
-
-        <h1 className="text-3xl font-bold tracking-wide relative z-10">
-          User Login
-        </h1>
-
-        <p className="text-white/60 text-sm tracking-wide leading-relaxed relative z-10">
-          Connect your Algorand wallet to view your NFT inventory
-        </p>
-
-        <div className="flex justify-center relative z-10 pt-4">
-          <CustomWalletButton />
+        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-8">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5282E1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
         </div>
 
-        {/* 🔥 Only show continue if wallet connected */}
-        {activeAccount?.address && (
-          <button
-            onClick={handleContinue}
-            className="w-full bg-white/10 hover:bg-white/20 transition text-white py-3 border border-white/20 rounded-2xl font-medium tracking-wide relative z-10 mt-6"
-          >
-            Continue to Inventory
-          </button>
-        )}
+        <h1 className="text-2xl font-semibold text-white mb-2">Consumer Login</h1>
+        <p className="text-white/40 text-sm mb-10">Connect your wallet to view your inventory.</p>
 
+        <div className="space-y-3">
+          <CustomWalletButton />
+
+          {activeAccount?.address && (
+            <button
+              onClick={() => navigate("/inventory")}
+              className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white py-3 rounded-xl text-sm font-medium transition-colors"
+            >
+              Continue to Inventory →
+            </button>
+          )}
+        </div>
+
+        <p className="text-white/20 text-xs mt-10">Products sync automatically from your wallet.</p>
       </div>
     </div>
   )

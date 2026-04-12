@@ -2,21 +2,18 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-200">
-      <div className="max-w-6xl mx-auto p-6 md:py-10 flex flex-col md:flex-row items-center justify-between gap-4">
-        <a href="/" className="flex items-center space-x-3">
-          
-          <span className="text-xl font-semibold text-[#1F2937]">TAG.IN</span>
-        </a>
-        <ul className="flex flex-wrap items-center gap-6 text-sm font-medium text-gray-500">
-          <li><a href="#" className="hover:underline">About</a></li>
-          <li><a href="#" className="hover:underline">Privacy Policy</a></li>
-          <li><a href="#" className="hover:underline">Licensing</a></li>
-          <li><a href="#" className="hover:underline">Contact</a></li>
+    <footer className="bg-black border-t border-white/5">
+      <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
+        <span className="text-sm font-semibold text-white/40">TAG-IN</span>
+        <ul className="flex flex-wrap items-center gap-6 text-xs text-white/20">
+          <li><a href="#" className="hover:text-white/50 transition-colors">About</a></li>
+          <li><a href="#" className="hover:text-white/50 transition-colors">Privacy</a></li>
+          <li><a href="#" className="hover:text-white/50 transition-colors">Licensing</a></li>
+          <li><a href="#" className="hover:text-white/50 transition-colors">Contact</a></li>
         </ul>
       </div>
-      <div className="border-t border-gray-200 text-center text-sm text-gray-500 py-4">
-        © 2025 TAG.IN. All Rights Reserved.
+      <div className="border-t border-white/5 text-center text-[11px] text-white/15 py-5">
+        © 2025 TAG-IN. All Rights Reserved.
       </div>
     </footer>
   );

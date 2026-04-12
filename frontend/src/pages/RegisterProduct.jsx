@@ -161,62 +161,70 @@ export default function RegisterProduct() {
     }
   }
 
-  const inputClass = "w-full bg-white/5 border border-white/10 text-white placeholder-white/30 px-4 py-3 rounded-xl focus:outline-none focus:border-[#5282E1] focus:ring-1 focus:ring-[#5282E1] transition"
+  const fields = [
+    { name: "name", placeholder: "Product Name", type: "text" },
+    { name: "serial", placeholder: "Serial Number", type: "text" },
+    { name: "model", placeholder: "Model", type: "text" },
+    { name: "type", placeholder: "Product Type", type: "text" },
+    { name: "color", placeholder: "Color", type: "text" },
+    { name: "manufactureDate", placeholder: "Manufacture Date", type: "date" },
+  ]
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-10 font-['ClashDisplay']">
+    <div className="min-h-screen bg-black px-6 lg:px-8 py-12">
+      <div className="max-w-2xl mx-auto">
 
-      {/* Top bar */}
-      <div className="flex justify-end mb-8 max-w-4xl mx-auto">
-        <CustomWalletButton />
-      </div>
+        {/* Top bar */}
+        <div className="flex items-center justify-between mb-10">
+          <h1 className="text-2xl font-semibold text-white">Register Product</h1>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleFillDemo}
+              className="text-xs font-medium text-white/30 hover:text-white/60 transition-colors"
+            >
+              Fill Demo
+            </button>
+            <CustomWalletButton />
+          </div>
+        </div>
 
-      <div className="max-w-3xl mx-auto bg-[#111111] border border-white/10 p-10 rounded-3xl space-y-6 relative overflow-hidden">
-
-        {/* Glow */}
-        <div className="absolute -top-32 -right-32 w-72 h-72 bg-[#5282E1]/10 rounded-full blur-[100px] pointer-events-none"></div>
-
-        <div className="flex justify-between items-center relative z-10">
-          <h1 className="text-3xl font-semibold tracking-wide">
-            Register Product
-          </h1>
+        {/* Form */}
+        <div className="border border-white/10 rounded-xl p-6 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {fields.map(f => (
+              <input
+                key={f.name}
+                name={f.name}
+                type={f.type}
+                value={form[f.name]}
+                onChange={handleChange}
+                placeholder={f.placeholder}
+                className="w-full bg-white/[0.03] border border-white/10 text-white placeholder-white/20 px-4 py-3 rounded-lg focus:outline-none focus:border-[#5282E1]/50 text-sm transition-colors [color-scheme:dark]"
+              />
+            ))}
+          </div>
 
           <button
-            onClick={handleFillDemo}
-            className="bg-white/5 hover:bg-white/10 border border-white/10 text-sm px-4 py-2 rounded-xl transition text-white/70 hover:text-white"
+            onClick={handleRegister}
+            disabled={loading}
+            className="w-full bg-[#5282E1] hover:bg-[#4272cc] disabled:opacity-40 text-white py-3 rounded-xl text-sm font-semibold transition-colors"
           >
-            Fill Demo Data
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                Registering…
+              </span>
+            ) : "Register Product →"}
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-          <input name="name" value={form.name} onChange={handleChange} placeholder="Product Name" className={inputClass} />
-          <input name="serial" value={form.serial} onChange={handleChange} placeholder="Serial Number" className={inputClass} />
-          <input name="model" value={form.model} onChange={handleChange} placeholder="Model" className={inputClass} />
-          <input name="type" value={form.type} onChange={handleChange} placeholder="Product Type" className={inputClass} />
-          <input name="color" value={form.color} onChange={handleChange} placeholder="Color" className={inputClass} />
-          <input name="manufactureDate" type="date" value={form.manufactureDate} onChange={handleChange} placeholder="Manufacture Date" className={`${inputClass} [color-scheme:dark]`} />
-        </div>
-
-        <button
-          onClick={handleRegister}
-          disabled={loading}
-          className="w-full bg-[#5282E1] hover:bg-[#3d68bc] disabled:opacity-50 text-white py-4 rounded-2xl font-semibold tracking-wide transition shadow-[0_0_20px_rgba(82,130,225,0.3)] relative z-10"
-        >
-          {loading ? (
-            <span className="flex items-center justify-center gap-3">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-              Registering...
-            </span>
-          ) : "Register Product"}
-        </button>
       </div>
 
       <ToastContainer
         position="top-right"
         autoClose={3000}
         theme="dark"
-        toastStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", color: "#fff" }}
+        toastStyle={{ background: "#111", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", borderRadius: "12px", fontSize: "13px" }}
       />
     </div>
   )

@@ -8,14 +8,14 @@ export default function SubscriptionPlans() {
       name: 'Starter',
       description: 'Perfect for small businesses getting started.',
       price: '$29',
-      period: 'per month',
+      period: '/mo',
       buttonText: 'Get Starter'
     },
     {
       name: 'Professional',
       description: 'Ideal for growing brands.',
       price: '$99',
-      period: 'per month',
+      period: '/mo',
       buttonText: 'Upgrade to PRO',
       highlight: true
     },
@@ -40,76 +40,42 @@ export default function SubscriptionPlans() {
   ];
 
   return (
-    <section className="pt-4 pb-24 bg-black text-white relative overflow-hidden font-['ClashDisplay'] border-t border-white/10">
-
-      {/* Background glows */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#5282E1]/10 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#5282E1]/5 rounded-full blur-[120px] pointer-events-none"></div>
-
-      <div className="max-w-[1200px] mx-auto px-6 lg:px-8 relative z-10">
-
-        {/* Pill */}
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-[#5282E1]/30 bg-[#5282E1]/10 text-sm font-bold text-[#5282E1]">
-            <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#5282E1]"></span>
-              Tag-In V2.0 is live
-            </span>
-            <a href="#" className="flex items-center gap-1 text-white/60 hover:text-white transition underline underline-offset-2 decoration-white/20">
-              Read <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
+    <section className="pt-8 pb-24 bg-black relative overflow-hidden border-t border-white/5">
+      <div className="max-w-5xl mx-auto px-6 lg:px-8">
 
         {/* Header */}
-        <div className="mb-10 text-center">
-          <h2 className="text-5xl font-extrabold tracking-tight mb-6">
-            Pricing plans
-          </h2>
-          <p className="text-xl text-white/50 font-medium">
-            Try our starter plan risk free for 30 days. Scale as you grow.
-          </p>
+        <div className="mb-14 text-center">
+          <h2 className="text-3xl font-semibold text-white mb-3">Pricing</h2>
+          <p className="text-white/30 text-sm">Start free. Scale as you grow.</p>
         </div>
 
-        {/* Toggle */}
-        <div className="flex justify-center mb-16">
-          <div className="inline-flex p-1 rounded-xl bg-white/5 border border-white/10">
-            <button className="px-5 py-2 rounded-lg bg-white/10 text-white text-sm font-bold border border-white/10">
-              Annual pricing
-            </button>
-            <button className="px-5 py-2 rounded-lg text-white/40 hover:text-white text-sm font-bold transition-colors">
-              Monthly pricing
-            </button>
-          </div>
-        </div>
-
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-20">
+        {/* Cards */}
+        <div className="grid md:grid-cols-3 gap-4 mb-16">
           {plans.map((plan, index) => (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.4, delay: index * 0.08 }}
               key={plan.name}
-              className={`rounded-2xl p-8 flex flex-col border transition-all ${
+              className={`rounded-xl p-6 flex flex-col border transition-colors ${
                 plan.highlight
-                  ? 'bg-[#5282E1] border-[#5282E1] shadow-[0_0_60px_rgba(82,130,225,0.3)] md:-translate-y-2'
-                  : 'bg-[#111111] border-white/10 hover:border-white/20'
+                  ? 'bg-[#5282E1] border-[#5282E1]'
+                  : 'bg-white/[0.03] border-white/10 hover:border-white/15'
               }`}
             >
-              <h3 className={`text-xl font-bold mb-1 ${plan.highlight ? 'text-white' : 'text-white'}`}>{plan.name}</h3>
-              <p className={`text-sm mb-8 ${plan.highlight ? 'text-blue-100' : 'text-white/40'}`}>{plan.description}</p>
+              <h3 className={`text-base font-semibold mb-0.5 ${plan.highlight ? 'text-white' : 'text-white'}`}>{plan.name}</h3>
+              <p className={`text-xs mb-6 ${plan.highlight ? 'text-white/70' : 'text-white/30'}`}>{plan.description}</p>
 
-              <div className="flex items-end gap-2 mb-8 mt-auto">
-                <span className="text-5xl font-black tracking-tighter">{plan.price}</span>
-                <span className={`text-sm font-semibold mb-1 ${plan.highlight ? 'text-blue-100' : 'text-white/40'}`}>{plan.period}</span>
+              <div className="flex items-baseline gap-1 mb-6 mt-auto">
+                <span className={`text-3xl font-bold ${plan.highlight ? 'text-white' : 'text-white'}`}>{plan.price}</span>
+                <span className={`text-xs ${plan.highlight ? 'text-white/60' : 'text-white/30'}`}>{plan.period}</span>
               </div>
 
-              <button className={`w-full py-3 px-4 rounded-xl font-bold text-sm transition-all mt-4 ${
+              <button className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                 plan.highlight
-                  ? 'bg-white text-[#5282E1] hover:bg-blue-50'
-                  : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'
+                  ? 'bg-white text-[#5282E1] hover:bg-white/90'
+                  : 'bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10'
               }`}>
                 {plan.buttonText}
               </button>
@@ -117,44 +83,37 @@ export default function SubscriptionPlans() {
           ))}
         </div>
 
-        {/* Feature Comparison Table */}
-        <div className="hidden md:block max-w-5xl mx-auto border-t border-white/10 pt-16">
-          <div className="grid grid-cols-4 gap-4 mb-4 pb-4 border-b border-white/10">
-            <div className="font-bold text-white/40 text-xs col-span-1 uppercase tracking-widest">Features</div>
+        {/* Comparison */}
+        <div className="hidden md:block border border-white/10 rounded-xl overflow-hidden">
+          <div className="grid grid-cols-4 gap-4 px-6 py-4 border-b border-white/10 bg-white/[0.02]">
+            <div className="text-white/30 text-xs font-medium uppercase tracking-wider">Features</div>
             {plans.map(plan => (
-              <div key={plan.name} className={`font-bold text-sm col-span-1 pl-4 ${plan.highlight ? 'text-[#5282E1]' : 'text-white/70'}`}>
+              <div key={plan.name} className={`text-sm font-medium pl-2 ${plan.highlight ? 'text-[#5282E1]' : 'text-white/50'}`}>
                 {plan.name}
               </div>
             ))}
           </div>
 
-          <div className="space-y-0">
+          <div className="divide-y divide-white/5">
             {features.map((feature, idx) => (
-              <div key={idx} className="grid grid-cols-4 gap-4 py-5 border-b border-white/5 hover:bg-white/5 transition-colors rounded-xl px-2">
-                <div className="col-span-1 flex items-center gap-2">
-                  <span className="text-sm font-medium text-white/60">{feature.name}</span>
-                  {feature.hasTooltip && (
-                    <HelpCircle className="w-3.5 h-3.5 text-white/20" />
-                  )}
+              <div key={idx} className="grid grid-cols-4 gap-4 px-6 py-3.5 hover:bg-white/[0.02] transition-colors">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-white/50">{feature.name}</span>
+                  {feature.hasTooltip && <HelpCircle className="w-3 h-3 text-white/15" />}
                 </div>
-
                 {feature.values.map((val, vIdx) => (
-                  <div key={vIdx} className="col-span-1 flex items-center pl-4">
+                  <div key={vIdx} className="flex items-center pl-2">
                     {val === 'yes' ? (
-                      <CheckCircle2 className="w-5 h-5 text-[#5282E1]" />
+                      <CheckCircle2 className="w-4 h-4 text-[#5282E1]" />
                     ) : val === 'no' ? (
-                      <span className="text-white/20 font-bold">—</span>
+                      <span className="text-white/15">—</span>
                     ) : (
-                      <span className="text-sm font-semibold text-white/70">{val}</span>
+                      <span className="text-xs font-medium text-white/50">{val}</span>
                     )}
                   </div>
                 ))}
               </div>
             ))}
-          </div>
-
-          <div className="mt-12 mb-4">
-            <h3 className="font-bold text-white/30 text-xs uppercase tracking-widest">Hardware & Infrastructure</h3>
           </div>
         </div>
 
